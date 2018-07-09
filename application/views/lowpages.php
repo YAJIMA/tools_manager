@@ -6,7 +6,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             <nav class="nav nav-pills flex-column">
             <?php if (isset($menues['link_item'])) : ?>
                 <?php foreach ($menues['link_item'] as $item) : ?>
-                    <a class="nav-link <?php if ($item['active'] == "active") : ?>active<?php endif; ?>" href="<?php echo $item['href']; ?>">
+                    <a class="nav-link <?php if ($item['active'] == "active") : ?>active<?php endif; ?>" href="<?php echo $item['href']; ?>" <?php if (isset($item['target'])) : echo 'target="'.$item['target'].'"'; endif; ?>>
                         <?php echo $item['text']; ?>
                         <?php if ($item['active'] == "active") : ?><span class="sr-only">(current)</span><?php endif; ?></a>
                 <?php endforeach; ?>

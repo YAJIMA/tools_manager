@@ -6,6 +6,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @property Users_model $users_model
  * @property Sites_model $sites_model
  * @property Menues_model $menues_model
+ * @property Lowpages_model $lowpages_model
  */
 class Lp_setting extends CI_Controller {
 
@@ -15,12 +16,13 @@ class Lp_setting extends CI_Controller {
     {
         parent::__construct();
 
-        $this->data['title'] = "";
+        $this->data['title'] = "設定";
 
         // モデルをロード
         $this->load->model('users_model');
         $this->load->model('sites_model');
         $this->load->model('menues_model');
+        $this->load->model('lowpages_model');
 
         // ログインしてなかったら、ログイン画面に戻る
         if ( ! $this->session->userdata("is_logged_in"))
@@ -28,14 +30,27 @@ class Lp_setting extends CI_Controller {
             redirect('login');
         }
 
+        // サイト一覧
+        $wheredata = array();
+        if ($this->session->users['group_id'] > 0)
+        {
+            $wheredata[] = array('kind' => 'where', 'field_name' => 'group_id', 'value' => $this->session->users['group_id']);
+        }
+        $wheredata[] = array('kind' => 'order_by', 'field_name' => 'sites.group_id', 'value' => 'ASC');
+        $wheredata[] = array('kind' => 'order_by', 'field_name' => 'sites.name', 'value' => 'ASC');
+        $sites = $this->sites_model->load($wheredata);
+        $this->data['sites'] = $sites;
+        $this->data['site_menues'] = $this->menues_model->sitemenues($sites, $this->session->site_id);
+
         // TODO: メニュー
         $menues = $this->menues_model->load($this->session->users['status'], 'lowpages', 'lp_setting');
         $this->data['menues'] = $menues;
+
     }
 
     public function index()
 	{
-	    $this->data['title'] = 'レポート';
+	    $this->data['title'] = '設定';
 
 	    // ページを表示
         $this->load->view('_header', $this->data);
@@ -43,4 +58,33 @@ class Lp_setting extends CI_Controller {
         $this->load->view('_footer', $this->data);
 	}
 
+	public function site($site_id = NULL)
+    {
+
+        $this->data['site_id'] = $site_id;
+
+        $wheredata[] = array('kind' => 'where', 'field_name' => 'sites.id', 'value' => $site_id);
+        $site_data = $this->sites_model->load($wheredata);
+        $this->data['site_data'] = $site_data[0];
+
+        $settingdata = array();
+        $settingdata[] = array('kind' => 'where', 'field_name' => 'site_id', 'value' => $site_id);
+        $settingdata[] = array('kind' => 'where', 'field_name' => 'name', 'value' => 'pattern');
+        $this->data['patterns'] = $this->lowpages_model->setting_load($settingdata);
+
+        $this->data['title'] = $site_data[0]['name'].'の設定';
+
+        // ページを表示
+        $this->load->view('_header', $this->data);
+        $this->load->view('lp_setting', $this->data);
+        $this->load->view('_footer', $this->data);
+    }
+
+    public function update()
+    {
+        $site_id = $this->input->post("site_id");
+        $this->lowpages_model->setting_update();
+
+        redirect('lp_setting/site/'.$site_id);
+    }
 }

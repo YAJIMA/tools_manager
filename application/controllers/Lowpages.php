@@ -28,6 +28,18 @@ class Lowpages extends CI_Controller {
             redirect('login');
         }
 
+        // サイト一覧
+        $wheredata = array();
+        if ($this->session->users['group_id'] > 0) {
+            $wheredata[] = array('kind' => 'where', 'field_name' => 'group_id', 'value' => $this->session->users['group_id']);
+        }
+        $wheredata[] = array('kind' => 'order_by', 'field_name' => 'sites.group_id', 'value' => 'ASC');
+        $wheredata[] = array('kind' => 'order_by', 'field_name' => 'sites.name', 'value' => 'ASC');
+        $sites = $this->sites_model->load($wheredata);
+        $this->data['sites'] = $sites;
+
+        $this->data['site_menues'] = $this->menues_model->sitemenues($sites, $this->session->site_id);
+
         // TODO: メニュー
         $menues = $this->menues_model->load($this->session->users['status'], 'lowpages', 'lowpages');
         $this->data['menues'] = $menues;

@@ -14,45 +14,111 @@ class Menues_model extends CI_Model
     // TODO: メニューをロード
     public function load($user_status = 0, $kind = 'default', $current_page = '')
     {
-        // 大メニュー
-        // 管理ページ
-        if ($user_status > 5)
-        {
-            // メニューのテンプレート
-            $tool_items = array('href' => '', 'text'=>'', 'active' => '');
-            // メニューの設定
-            $tool_items['href'] = base_url('home');
-            $tool_items['text'] = '管理';
-            if ($current_page == 'home')
-            {
-                $tool_items['active'] = 'active';
-            }
-
-            $this->menues['tool_item'][] = $tool_items;
-        }
-
-        // 低評価ページ
-        // メニューのテンプレート
-        $tool_items = array('href' => '', 'text'=>'', 'active' => '');
-        // メニューの設定
-        $tool_items['href'] = base_url('lowpages');
-        $tool_items['text'] = '低評価ページ';
-        if ($current_page == 'lowpages')
-        {
-            $tool_items['active'] = 'active';
-        }
-        $this->menues['tool_item'][] = $tool_items;
 
         // 中メニュー
         switch (strtolower($kind))
         {
-            // 低評価ページのメニュー
-            case "lowpages":
+            // ホームのメニュー
+            case "home":
+
+                switch ($user_status)
+                {
+                    case '9':
+                        // メニューのテンプレート
+                        $link_items = array('href' => '', 'text'=>'', 'active' => '');
+                        // メニューの設定
+                        $link_items['href'] = base_url('home');
+                        $link_items['text'] = '管理ホーム';
+                        $link_items['active'] = ($current_page == 'home') ? 'active' : '';
+                        $this->menues['link_item'][] = $link_items;
+
+                        // メニューのテンプレート
+                        $link_items = array('href' => '', 'text'=>'', 'active' => '');
+                        // メニューの設定
+                        $link_items['href'] = base_url('group');
+                        $link_items['text'] = 'グループ管理';
+                        $link_items['active'] = ($current_page == 'group') ? 'active' : '';
+                        $this->menues['link_item'][] = $link_items;
+
+                        // メニューのテンプレート
+                        $link_items = array('href' => '', 'text'=>'', 'active' => '');
+                        // メニューの設定
+                        $link_items['href'] = base_url('user');
+                        $link_items['text'] = 'ユーザ管理';
+                        $link_items['active'] = ($current_page == 'user') ? 'active' : '';
+                        $this->menues['link_item'][] = $link_items;
+
+                        // メニューのテンプレート
+                        $link_items = array('href' => '', 'text'=>'', 'active' => '');
+                        // メニューの設定
+                        $link_items['href'] = base_url('site');
+                        $link_items['text'] = 'サイト管理';
+                        $link_items['active'] = ($current_page == 'site') ? 'active' : '';
+                        $this->menues['link_item'][] = $link_items;
+                        break;
+                    case '7':
+                        // メニューのテンプレート
+                        $link_items = array('href' => '', 'text'=>'', 'active' => '');
+                        // メニューの設定
+                        $link_items['href'] = base_url('home');
+                        $link_items['text'] = '管理ホーム';
+                        $link_items['active'] = ($current_page == 'home') ? 'active' : '';
+                        $this->menues['link_item'][] = $link_items;
+
+                        // メニューのテンプレート
+                        $link_items = array('href' => '', 'text'=>'', 'active' => '');
+                        // メニューの設定
+                        $link_items['href'] = base_url('group');
+                        $link_items['text'] = 'グループ管理';
+                        $link_items['active'] = ($current_page == 'group') ? 'active' : '';
+                        $this->menues['link_item'][] = $link_items;
+
+                        // メニューのテンプレート
+                        $link_items = array('href' => '', 'text'=>'', 'active' => '');
+                        // メニューの設定
+                        $link_items['href'] = base_url('site');
+                        $link_items['text'] = 'サイト管理';
+                        $link_items['active'] = ($current_page == 'site') ? 'active' : '';
+                        $this->menues['link_item'][] = $link_items;
+                        break;
+                    case '1':
+                        break;
+                }
+
                 // メニューのテンプレート
                 $link_items = array('href' => '', 'text'=>'', 'active' => '');
                 // メニューの設定
                 $link_items['href'] = base_url('lowpages');
-                $link_items['text'] = '低評価ページ';
+                $link_items['text'] = '&gt;&gt; 低品質ページ';
+                if ($current_page == 'lowpages')
+                {
+                    $link_items['active'] = 'active';
+                }
+                $this->menues['link_item'][] = $link_items;
+
+                break;
+
+            // 低評価ページのメニュー
+            case "lowpages":
+                // 大メニュー
+                // メニューのテンプレート
+                $tool_items = array('href' => '', 'text'=>'', 'active' => '');
+                // メニューの設定
+                $tool_items['href'] = base_url('lowpages');
+                $tool_items['text'] = '低品質ページ';
+                if ($current_page == 'lowpages')
+                {
+                    $tool_items['active'] = 'active';
+                }
+                $this->menues['tool_item'][] = $tool_items;
+
+                // サイトメニュー
+
+                // メニューのテンプレート
+                $link_items = array('href' => '', 'text'=>'', 'active' => '');
+                // メニューの設定
+                $link_items['href'] = base_url('lowpages');
+                $link_items['text'] = '低品質ページ';
                 if ($current_page == 'lowpages')
                 {
                     $link_items['active'] = 'active';
@@ -72,6 +138,7 @@ class Menues_model extends CI_Model
 
                 if ($user_status > 5)
                 {
+                    // CSVファイルアップロード
                     // メニューのテンプレート
                     $link_items = array('href' => '', 'text'=>'', 'active' => '');
                     // メニューの設定
@@ -83,6 +150,20 @@ class Menues_model extends CI_Model
                     }
                     $this->menues['link_item'][] = $link_items;
 
+                    // インデックスチェック
+                    // メニューのテンプレート
+                    $link_items = array('href' => '', 'text'=>'', 'active' => '', 'target' => '');
+                    // メニューの設定
+                    $link_items['href'] = base_url('exec/sitecheck');
+                    $link_items['text'] = 'インデックスチェック';
+                    $link_items['target'] = '_blank';
+                    if ($current_page == 'exec')
+                    {
+                        $link_items['active'] = 'active';
+                    }
+                    $this->menues['link_item'][] = $link_items;
+
+                    // 設定
                     // メニューのテンプレート
                     $link_items = array('href' => '', 'text'=>'', 'active' => '');
                     // メニューの設定
@@ -96,6 +177,29 @@ class Menues_model extends CI_Model
                 }
 
                 break;
+        }
+
+        return $this->menues;
+    }
+
+    // TODO: サイトメニュー
+    public function sitemenues($sites = NULL, $current_id = 0)
+    {
+        $this->menues['site_item'] = array();
+
+        foreach ($sites as $site)
+        {
+            // メニューのテンプレート
+            $site_items = array('href' => '', 'text'=>'', 'active' => '');
+            // メニューの設定
+            $uri = 'lp_reports/site/'.$site['id'];
+            $site_items['href'] = base_url($uri);
+            $site_items['text'] = $site['name'];
+            if ($current_id == $site['id'])
+            {
+                $site_items['active'] = 'active';
+            }
+            $this->menues['site_item'][] = $site_items;
         }
 
         return $this->menues;

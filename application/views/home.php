@@ -15,33 +15,29 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         </div>
         <div class="col-md-6">
             <h2>ダッシュボード</h2>
+            <p>管理トップページです。利用したいツールを以下のリンクから選んで下さい。</p>
+            <ul>
+                <li><a href="<?php echo base_url('lowpages'); ?>">低品質ページツール</a></li>
+            </ul>
         </div>
         <div class="col-md-4">
-            <h2>更新履歴</h2>
+            <h2>ヒント</h2>
             <div class="list-group">
                 <div href="#" class="list-group-item flex-column align-items-start">
                     <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">List group item heading</h5>
-                        <small class="text-muted">3 days ago</small>
+                        <h5 class="mb-1">グループ管理</h5>
+                        <small class="text-muted">2018/07/05</small>
                     </div>
-                    <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
-                    <small>Donec id elit non mi porta.</small>
+                    <p class="mb-1">グループ内に、ユーザー、およびサイトを所属させます。グループをクライアント、ユーザーを担当者、サイトをサイトで管理することを基準に設計されています。</p>
+                    <small class="text-muted">&nbsp;</small>
                 </div>
                 <div href="#" class="list-group-item flex-column align-items-start">
                     <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">List group item heading</h5>
-                        <small class="text-muted">3 days ago</small>
+                        <h5 class="mb-1">低品質ページツール</h5>
+                        <small class="text-muted">2018/07/05</small>
                     </div>
-                    <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
-                    <small class="text-muted">Donec id elit non mi porta.</small>
-                </div>
-                <div href="#" class="list-group-item flex-column align-items-start">
-                    <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">List group item heading</h5>
-                        <small class="text-muted">3 days ago</small>
-                    </div>
-                    <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
-                    <small class="text-muted">Donec id elit non mi porta.</small>
+                    <p class="mb-1">低品質ページツールは、Google キャッシュ、および So-net インデックス数を元にページの品質を評価します。</p>
+                    <small class="text-muted">&nbsp;</small>
                 </div>
             </div>
         </div>

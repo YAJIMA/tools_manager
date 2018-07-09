@@ -25,6 +25,7 @@ class Group extends CI_Controller
         $this->load->model('users_model');
         $this->load->model('sites_model');
         $this->load->model('groups_model');
+        $this->load->model('menues_model');
 
         // ログインしてなかったら、ログイン画面に戻る
         if ( ! $this->session->userdata("is_logged_in"))
@@ -33,40 +34,7 @@ class Group extends CI_Controller
         }
 
         // メニュー
-        $menues = array();
-
-        switch ($this->session->users['status'])
-        {
-            case '9': // 管理者
-                $menues['site_head'] = '管理';
-                // ツールリンク
-                $menues['tool_item'][] = array('href' => base_url('home'), 'text'=>'管理', 'active' => 'active');
-                $menues['tool_item'][] = array('href' => base_url('lowpages'), 'text'=>'低評価ページ', 'active' => '');
-                // サブメニュー
-                $menues['link_item'][] = array('href' => base_url('home'), 'text'=>'管理ホーム', 'active' => '');
-                $menues['link_item'][] = array('href' => base_url('group'), 'text'=>'グループ管理', 'active' => 'active');
-                $menues['link_item'][] = array('href' => base_url('user'), 'text'=>'ユーザ管理', 'active' => '');
-                $menues['link_item'][] = array('href' => base_url('site'), 'text'=>'サイト管理', 'active' => '');
-                break;
-            case '7': // スタッフ
-                $menues['site_head'] = '管理';
-                // ツールリンク
-                $menues['tool_item'][] = array('href' => base_url('home'), 'text'=>'管理', 'active' => 'active');
-                $menues['tool_item'][] = array('href' => base_url('lowpages'), 'text'=>'低評価ページ', 'active' => '');
-                // サブメニュー
-                $menues['link_item'][] = array('href' => base_url('home'), 'text'=>'管理ホーム', 'active' => '');
-                $menues['link_item'][] = array('href' => base_url('group'), 'text'=>'グループ管理', 'active' => 'active');
-                $menues['link_item'][] = array('href' => base_url('site'), 'text'=>'サイト管理', 'active' => '');
-                break;
-            case '1': // 一般ユーザ
-                $menues['site_head'] = '管理';
-                // ツールリンク
-                $menues['tool_item'][] = array('href' => base_url('lowpages'), 'text'=>'低評価ページ', 'active' => '');
-                break;
-            default:
-                break;
-        }
-
+        $menues = $this->menues_model->load($this->session->users['status'], 'home', 'group');
         $this->data['menues'] = $menues;
 
         // グループ一覧
@@ -197,7 +165,15 @@ class Group extends CI_Controller
         else
         {
             $this->groups_model->update();
-            redirect('group/edit/'.$group_id);
+            if ( ! empty($this->input->post("deletecheck")))
+            {
+                redirect('group');
+            }
+            else
+            {
+                redirect('group/edit/'.$group_id);
+            }
+
         }
     }
 }

@@ -113,15 +113,6 @@ class Sites_model extends CI_Model
                 }
             }
             unset($key, $val);
-
-            if (isset($data['where']))
-            {
-                foreach ($data['where'] as $val)
-                {
-                    $this->db->where($val['field_name'], $val['value']);
-                }
-                unset($val);
-            }
         }
 
         // クエリ実行
@@ -176,4 +167,5 @@ class Sites_model extends CI_Model
     {
         $this->db->delete('sites', array('id' => $site_id));
     }
+
 }
