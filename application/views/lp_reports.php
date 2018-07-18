@@ -17,6 +17,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             <h2>レポート</h2>
             <?php if (isset($reports)) : ?>
             <!-- <?php echo $excelfile; ?> -->
+                <p>インデックスチェックは最大 <?php echo $indexmonth; ?>ヶ月分の履歴を保持しています。</p>
                 <p><a href="<?php echo base_url('lp_reports/file/'.basename($excelfile));?>">レポートファイル（Excel）ダウンロード</a></p>
             <table class="table table-striped">
                 <thead>

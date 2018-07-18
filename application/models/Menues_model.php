@@ -154,10 +154,9 @@ class Menues_model extends CI_Model
                     // メニューのテンプレート
                     $link_items = array('href' => '', 'text'=>'', 'active' => '', 'target' => '');
                     // メニューの設定
-                    $link_items['href'] = base_url('exec/sitecheck');
+                    $link_items['href'] = base_url('lp_indexcheck');
                     $link_items['text'] = 'インデックスチェック';
-                    $link_items['target'] = '_blank';
-                    if ($current_page == 'exec')
+                    if ($current_page == 'lp_indexcheck')
                     {
                         $link_items['active'] = 'active';
                     }

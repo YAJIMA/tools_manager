@@ -22,16 +22,35 @@ $userstatus = array(
         </div>
         <div class="col-md-5">
             <h2>ユーザ一覧</h2>
-            <div class="list-group">
-                <a class="list-group-item list-group-item-action list-group-item-success d-flex justify-content-between align-items-center <?php if (uri_string() == 'user') : ?>active<?php endif; ?>" href="<?php echo base_url('user'); ?>">ユーザ追加
-                    <span class="badge badge-primary badge-pill">+</span>
-                </a>
+            <p>
+                <a class="<?php if (uri_string() == 'user') : ?>active<?php endif; ?>" href="<?php echo base_url('user'); ?>">新しいユーザを追加</a>
+            </p>
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>ユーザ名</th>
+                    <th>グループ</th>
+                    <th>権限</th>
+                </tr>
+                </thead>
+                <tbody>
                 <?php foreach ($users as $user) : ?>
-                <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center <?php if (uri_string() == 'user/edit/'.$user['id']) : ?>active<?php endif; ?>" href="<?php echo base_url('user/edit/'.$user['id']); ?>"><?php echo $user['username']; ?>
-                    <span class="badge badge-primary badge-pill"><?php echo $userstatus[$user['status']]; ?></span>
-                </a>
+                <tr>
+                    <td>
+                        <a class="<?php if (uri_string() == 'user/edit/'.$user['id']) : ?>active<?php endif; ?>" href="<?php echo base_url('user/edit/'.$user['id']); ?>"><?php echo $user['username']; ?>
+                            <span class="badge badge-primary badge-pill"></span>
+                        </a>
+                    </td>
+                    <td>
+                        <?php echo $user['groupname']; ?>
+                    </td>
+                    <td>
+                        <?php echo $userstatus[$user['status']]; ?>
+                    </td>
+                </tr>
                 <?php endforeach; ?>
-            </div>
+                </tbody>
+            </table>
         </div>
         <div class="col-md-5">
             <?php if (isset($userdata)) : ?>

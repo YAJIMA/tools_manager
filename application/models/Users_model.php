@@ -202,8 +202,12 @@ class Users_model extends CI_Model
             }
         }
 
+        $this->db->select("users.id, users.username, users.email, users.status, users.group_id, groups.name as groupname");
+
+        $this->db->join('groups','groups.id = users.group_id','left');
+
         $this->db->where("status >", 0);
-        $this->db->order_by("username", "ASC");
+
         $query = $this->db->get("users");
 
         $result = $query->result_array();

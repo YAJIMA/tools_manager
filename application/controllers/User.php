@@ -42,6 +42,8 @@ class User extends CI_Controller
         if ($this->session->users['group_id'] > 0)
         {
             $wheredata[] = array('kind' => 'where', 'field_name' => 'group_id', 'value' => $this->session->users['group_id']);
+            $wheredata[] = array('kind' => 'order_by', 'field_name' => 'group_id', 'value' => 'ASC');
+            $wheredata[] = array('kind' => 'order_by', 'field_name' => 'status', 'value' => 'DESC');
         }
         $this->data['users'] = $this->users_model->load($wheredata);
 
@@ -112,7 +114,7 @@ class User extends CI_Controller
 
         // 対象のユーザー
         $wheredata = array();
-        $wheredata[] = array('kind' => 'where', 'field_name' => 'id', 'value' => $user_id) ;
+        $wheredata[] = array('kind' => 'where', 'field_name' => 'users.id', 'value' => $user_id) ;
         $userdata = $this->users_model->load($wheredata);
         $this->data['userdata'] = $userdata[0];
 
@@ -147,7 +149,7 @@ class User extends CI_Controller
         {
             // 対象のユーザー
             $wheredata = array();
-            $wheredata[] = array('kind' => 'where', 'field_name' => 'id', 'value' => $user_id) ;
+            $wheredata[] = array('kind' => 'where', 'field_name' => 'users.id', 'value' => $user_id) ;
             $userdata = $this->users_model->load($wheredata);
             $this->data['userdata'] = $userdata[0];
 

@@ -67,10 +67,34 @@ class Lp_setting extends CI_Controller {
         $site_data = $this->sites_model->load($wheredata);
         $this->data['site_data'] = $site_data[0];
 
+        // 除外パターン
         $settingdata = array();
         $settingdata[] = array('kind' => 'where', 'field_name' => 'site_id', 'value' => $site_id);
         $settingdata[] = array('kind' => 'where', 'field_name' => 'name', 'value' => 'pattern');
         $this->data['patterns'] = $this->lowpages_model->setting_load($settingdata);
+
+        // インデックスチェック履歴数
+        $settingdata = array();
+        $settingdata[] = array('kind' => 'where', 'field_name' => 'site_id', 'value' => $site_id);
+        $settingdata[] = array('kind' => 'where', 'field_name' => 'name', 'value' => 'indexmonth');
+        $this->data['indexmonth'] = $this->lowpages_model->setting_load($settingdata);
+
+        // 優先度
+        $google_cache_days_check = $index_check_check = array("off","off","off");
+        $google_cache_days = array();
+        $index_check = array();
+
+        $priority_data = $this->lowpages_model->priority_load($site_id);
+
+        $google_cache_days = $priority_data['google_cache_days'];
+        $index_check = $priority_data['index_check'];
+        $google_cache_days_check = $priority_data['google_cache_days_check'];
+        $index_check_check = $priority_data['index_check_check'];
+
+        $this->data['google_cache_days_check'] = $google_cache_days_check;
+        $this->data['index_check_check'] = $index_check_check;
+        $this->data['google_cache_days'] = $google_cache_days;
+        $this->data['index_check'] = $index_check;
 
         $this->data['title'] = $site_data[0]['name'].'の設定';
 

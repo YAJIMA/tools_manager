@@ -81,7 +81,22 @@ class Lp_reports extends CI_Controller {
         $site_info = $this->sites_model->load($data);
         $this->data['siteinfo'] = $site_info[0];
 
-        $this->data['reports'] = $reports = $this->lowpages_model->build_report($this->session->site_id);
+        // インデックスチェック履歴数
+        $settingdata = array();
+        $settingdata[] = array('kind' => 'where', 'field_name' => 'site_id', 'value' => $site_id);
+        $settingdata[] = array('kind' => 'where', 'field_name' => 'name', 'value' => 'indexmonth');
+        $indexmonthes = $this->lowpages_model->setting_load($settingdata);
+        if ( isset($indexmonthes[0]) )
+        {
+            $indexmonth = $indexmonthes[0]['value'];
+        }
+        else
+        {
+            $indexmonth = INDEXMONTH;
+        }
+        $this->data['indexmonth'] = $indexmonth;
+
+        $this->data['reports'] = $reports = $this->lowpages_model->build_report($this->session->site_id, $indexmonth);
 
         try
         {
