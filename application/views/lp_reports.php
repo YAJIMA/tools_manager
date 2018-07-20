@@ -19,6 +19,15 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             <!-- <?php echo $excelfile; ?> -->
                 <p>インデックスチェックは最大 <?php echo $indexmonth; ?>ヶ月分の履歴を保持しています。</p>
                 <p><a href="<?php echo base_url('lp_reports/file/'.basename($excelfile));?>">レポートファイル（Excel）ダウンロード</a></p>
+            <?php if (isset($directories)) : ?>
+            <h3>階層で絞り込み</h3>
+                <p>階層（ディレクトリ）でレポートを絞り込み表示できます。<br>階層を選んでください。</p>
+            <div class="list-group">
+                <?php foreach ($directories as $d) : ?>
+                    <a href="<?php echo base_url('lp_reports/site/'.$this->session->site_id.'/'.dir2path($d,'__')); ?>" class="list-group-item"><?php echo $d; ?></a>
+                <?php endforeach; ?>
+            </div>
+            <?php endif; ?>
             <table class="table table-striped">
                 <thead>
                 <tr>
@@ -40,7 +49,13 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 <tr>
                     <td><?php echo $operations[$report['operation']]; ?></td>
                     <td><?php echo $report['path']; ?></td>
-                    <td><?php echo $report['directory']; ?></td>
+                    <td>
+                        <?php if ($report['directory'] !== "/") : ?>
+                            <a href="<?php echo base_url('lp_reports/site/'.$this->session->site_id.'/'.dir2path($report['directory'],'__')); ?>"><?php echo $report['directory']; ?></a>
+                        <?php else : ?>
+                            <?php echo $report['directory']; ?>
+                        <?php endif; ?>
+                    </td>
                     <td><?php echo $report['title']; ?></td>
                     <td><?php echo $report['upload_datetime']; ?></td>
                     <td><?php echo $report['cache_datetime']; ?></td>

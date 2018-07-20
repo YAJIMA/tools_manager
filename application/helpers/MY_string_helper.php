@@ -25,3 +25,19 @@ if ( ! function_exists('stringfromcolindex'))
         return $letter;
     }
 }
+
+if ( ! function_exists('path2directory'))
+{
+    function path2directory($str, $search = '__')
+    {
+        return str_replace($search, DIRECTORY_SEPARATOR, $str);
+    }
+}
+
+if ( ! function_exists('dir2path'))
+{
+    function dir2path($str, $search = '__')
+    {
+        return str_replace(DIRECTORY_SEPARATOR, $search, $str);
+    }
+}

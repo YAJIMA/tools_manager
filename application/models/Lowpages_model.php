@@ -585,7 +585,7 @@ class Lowpages_model extends CI_Model
      * @param int $indexmonth
      * @return array
      */
-    public function build_report($site_id, $indexmonth = INDEXMONTH)
+    public function build_report($site_id, $indexmonth = INDEXMONTH, $directory = NULL)
     {
         $result = array();
         $cols = array();
@@ -601,6 +601,10 @@ class Lowpages_model extends CI_Model
         $this->db->join('icbs','icbs.lowpage_id = lowpages.id','left');
         $this->db->where('lowpages.site_id', $site_id);
         $this->db->where('icbs.yyyymm >', $olderdate);
+        if ( ! empty($directory))
+        {
+            $this->db->like('address', $directory);
+        }
         $this->db->order_by('lowpages.address','ASC');
         $this->db->order_by('icbs.yyyymm','DESC');
 

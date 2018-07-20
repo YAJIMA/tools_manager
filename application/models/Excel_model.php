@@ -15,7 +15,7 @@ class Excel_model extends CI_Model
 {
 
     // レポートのExcel書き出し
-    public function write_reports($data = NULL)
+    public function write_reports($data = NULL, $priority_data = NULL)
     {
 
         // 出力ファイルパス
@@ -230,10 +230,62 @@ class Excel_model extends CI_Model
         $sheet->setTitle('■低品質ページ詳細');
 
         // TODO: ヘッダー行
-        $sheet->setCellValue('A1', '低品質(優先度:高)=Googleキャッシュ日が概ね40日前');
-        $sheet->setCellValue('A2', '低品質(優先度:中)=2ヶ月連続So-netインデックスなし　/　低品質(優先度:低)=So-netインデックスなし');
-        $sheet->setCellValue('F1', 'so-netインデックスあり');
-        $sheet->setCellValue('F2', 'so-netインデックスなし');
+        $a1 = '低品質(優先度:高)=';
+        $a2 = '低品質(優先度:中)=';
+        $a3 = '低品質(優先度:低)=';
+        if ( ! empty($priority_data))
+        {
+            // 優先度:高
+            if (isset($priority_data['google_cache_days_check'][0]) && $priority_data['google_cache_days_check'][0] == "on")
+            {
+                $a1 .= 'Googleキャッシュ日が概ね';
+                $a1 .= (isset($priority_data['google_cache_days'][0])) ? $priority_data['google_cache_days'][0] : GOOGLECACHEDAYS0;
+                $a1 .= '日前';
+            }
+
+            if (isset($priority_data['index_check_check'][0]) && $priority_data['index_check_check'][0] == "on")
+            {
+                $a1 .= ',';
+                $a1 .= (isset($priority_data['index_check'][0])) ? $priority_data['index_check'][0] : INDEXCHECK0;
+                $a1 .= 'ヶ月連続So-netインデックスなし';
+            }
+
+            // 優先度:中
+            if (isset($priority_data['google_cache_days_check'][1]) && $priority_data['google_cache_days_check'][1] == "on")
+            {
+                $a2 .= 'Googleキャッシュ日が概ね';
+                $a2 .= (isset($priority_data['google_cache_days'][1])) ? $priority_data['google_cache_days'][1] : GOOGLECACHEDAYS1;
+                $a2 .= '日前';
+            }
+
+            if (isset($priority_data['index_check_check'][1]) && $priority_data['index_check_check'][1] == "on")
+            {
+                $a2 .= ',';
+                $a2 .= (isset($priority_data['index_check'][1])) ? $priority_data['index_check'][1] : INDEXCHECK1;
+                $a2 .= 'ヶ月連続So-netインデックスなし';
+            }
+
+            // 優先度:低
+            if (isset($priority_data['google_cache_days_check'][2]) && $priority_data['google_cache_days_check'][2] == "on")
+            {
+                $a3 .= 'Googleキャッシュ日が概ね';
+                $a3 .= (isset($priority_data['google_cache_days'][2])) ? $priority_data['google_cache_days'][2] : GOOGLECACHEDAYS2;
+                $a3 .= '日前';
+            }
+
+            if (isset($priority_data['index_check_check'][2]) && $priority_data['index_check_check'][2] == "on")
+            {
+                $a3 .= ',';
+                $a3 .= (isset($priority_data['index_check'][2])) ? $priority_data['index_check'][2] : INDEXCHECK2;
+                $a3 .= 'ヶ月連続So-netインデックスなし';
+            }
+
+        }
+        $sheet->setCellValue('A1', $a1);
+        $sheet->setCellValue('A2', $a2);
+        $sheet->setCellValue('A3', $a3);
+        $sheet->setCellValue('F2', 'so-netインデックスあり');
+        $sheet->setCellValue('F3', 'so-netインデックスなし');
 
         // TODO: インデックス列の数だけ繰り返す
         $colsnum = 0;
@@ -243,8 +295,8 @@ class Excel_model extends CI_Model
             for ($i = 0; $i < $colsnum; $i++)
             {
                 $colstring = $this->stringfromcolindex($i + 7);
-                $sheet->setCellValue($colstring.'1', '=COUNTIF('.$colstring.'4:'.$colstring.'9999,">0")');
-                $sheet->setCellValue($colstring.'2', '=COUNTIF('.$colstring.'4:'.$colstring.'9999,"0")');
+                $sheet->setCellValue($colstring.'2', '=COUNTIF('.$colstring.'4:'.$colstring.'9999,">0")');
+                $sheet->setCellValue($colstring.'3', '=COUNTIF('.$colstring.'4:'.$colstring.'9999,"0")');
             }
         }
 
@@ -267,27 +319,28 @@ class Excel_model extends CI_Model
             ],
         ];
 
-        $sheet->setCellValue('A3','施策');
-        $sheet->setCellValue('B3','URL');
-        $sheet->setCellValue('C3','ディレクトリ');
-        $sheet->setCellValue('D3','TITLE');
-        $sheet->setCellValue('E3','更新日');
-        $sheet->setCellValue('F3','Googleキャッシュ日');
+        $sheet->setCellValue('A4','施策');
+        $sheet->setCellValue('B4','URL');
+        $sheet->setCellValue('C4','ディレクトリ');
+        $sheet->setCellValue('D4','TITLE');
+        $sheet->setCellValue('E4','更新日');
+        $sheet->setCellValue('F4','Googleキャッシュ日');
 
         for ($i = 0; $i < $colsnum; $i++)
         {
             $colstring = $this->stringfromcolindex($i + 7);
-            $sheet->setCellValue($colstring.'3',$data['cols'][$i]);
+            $sheet->setCellValue($colstring.'4',$data['cols'][$i]);
         }
 
         if (isset($colstring))
         {
-            $sheet->getStyle('A3:'.$colstring.'3')->applyFromArray($styleArray);
+            // タイトル行の配色
+            $sheet->getStyle('A4:'.$colstring.'4')->applyFromArray($styleArray);
         }
 
 
         // TODO: データ書き込み
-        $startRow = 4;
+        $startRow = 5;
         $olddate = mktime(0,0,0,date('n'),date('j')-40,date('Y'));
         $datestr = 'DATE('.date("Y,n,j",$olddate).')';
 

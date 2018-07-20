@@ -62,7 +62,7 @@ class Lp_reports extends CI_Controller {
         $this->load->view('_footer', $this->data);
 	}
 
-	public  function site($site_id = 0)
+	public  function site($site_id = 0, $directory = NULL)
     {
         // エクセルモデル
         $this->load->model('excel_model');
@@ -81,6 +81,13 @@ class Lp_reports extends CI_Controller {
         $site_info = $this->sites_model->load($data);
         $this->data['siteinfo'] = $site_info[0];
 
+        // 優先度
+        $google_cache_days_check = $index_check_check = array("off","off","off");
+        $google_cache_days = array();
+        $index_check = array();
+
+        $priority_data = $this->lowpages_model->priority_load($this->session->site_id);
+
         // インデックスチェック履歴数
         $settingdata = array();
         $settingdata[] = array('kind' => 'where', 'field_name' => 'site_id', 'value' => $site_id);
@@ -96,11 +103,38 @@ class Lp_reports extends CI_Controller {
         }
         $this->data['indexmonth'] = $indexmonth;
 
-        $this->data['reports'] = $reports = $this->lowpages_model->build_report($this->session->site_id, $indexmonth);
+        if ( ! empty($directory))
+        {
+            $dir = path2directory($directory, '__');
+        }
+        else
+        {
+            $dir = NULL;
+        }
+        $this->data['reports'] = $reports = $this->lowpages_model->build_report($this->session->site_id, $indexmonth, $dir);
 
+        // 階層の作成
+        if ($directory == NULL)
+        {
+            $directories = array();
+            foreach ($reports as $report)
+            {
+                if ( ! empty($report['directory']) && $report['directory'] !== "/")
+                {
+                    if ( ! in_array($report['directory'],$directories))
+                    {
+                        $directories[] = $report['directory'];
+                    }
+                }
+            }
+            unset($report);
+            $this->data['directories'] = $directories;
+        }
+
+        // エクセルファイルを作成
         try
         {
-            $this->data['excelfile'] = $this->excel_model->write_reports($reports);
+            $this->data['excelfile'] = $this->excel_model->write_reports($reports, $priority_data);
         }
         catch (Exception $e)
         {
