@@ -14,12 +14,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             </nav>
         </div>
         <div class="col-md-10">
-            <!-- TODO: 送信フォーム -->
+            <!-- 送信完了メッセージ -->
             <?php if (isset($resultdata)) : ?>
                 <div class="alert alert-success" role="alert">データを登録しました。</div>
             <?php endif; ?>
+            <!-- //送信完了メッセージ -->
 
-            <?php if ( ! isset($rowdata) || ! isset($rowdatacache)) : ?>
+            <!-- 送信フォーム -->
+            <?php if (isset($disp) && $disp == "form") : ?>
                 <h2>Screaming Frog SEO Spider</h2>
             <?php echo validation_errors(); ?>
                 <?php echo form_open_multipart("lp_csv/upload", array("role" => "form", "class" => "form"), array("uri_string" => uri_string())); ?>
@@ -97,15 +99,60 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 </div>
                 <?php echo form_close(); ?>
             <?php endif; ?>
+            <!-- //送信フォーム -->
 
+            <!-- 登録カラム設定フォーム -->
+            <?php if (isset($headline)) : ?>
+            <h2>パンくずリスト列の選択</h2>
+                <p>パンくずリストとして登録するカラムを設定してください。</p>
+                <?php echo form_open('lp_csv/preview', array("role" => "form", "class" => "form")); ?>
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered table-condensed">
+                        <tbody>
+                        <?php foreach ($headline as $key => $hl) : ?>
+                        <tr>
+                            <th style="width:20%;">
+                                <?php echo $hl; ?>
+                            </th>
+                            <td style="width:20%;">
+                                <select name="col_<?php echo $key; ?>" class="form-control">
+                                    <option value="-none-">未設定</option>
+                                    <option value="breadcrumb1--<?php echo $hl; ?>">パンくずリスト 1</option>
+                                    <option value="breadcrumb2--<?php echo $hl; ?>">パンくずリスト 2</option>
+                                    <option value="breadcrumb3--<?php echo $hl; ?>">パンくずリスト 3</option>
+                                    <option value="breadcrumb4--<?php echo $hl; ?>">パンくずリスト 4</option>
+                                    <option value="breadcrumb5--<?php echo $hl; ?>">パンくずリスト 5</option>
+                                </select>
+                            </td>
+                            <?php for ($i = 0; $i < 3; $i++) : ?>
+                            <td class="text-muted" style="overflow: hidden; width: 20%;">
+                                <?php echo $previewdata[$i][$hl]; ?>
+                            </td>
+                            <?php endfor; ?>
+                        </tr>
+                        <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">登録</button>
+                </div>
+                <?php echo form_close(); ?>
+            <?php endif; ?>
+            <!-- //登録カラム設定フォーム -->
+
+            <!-- プレビュー -->
             <?php if (isset($rowdata)) : ?>
+                <h2>登録行の確認</h2>
                 <p>登録しないデータ行は、チェックを外して下さい。</p>
+                <?php if (count($patterns) > 0) : ?>
                 <p>以下のパターンに一致した行は省かれています。</p>
                 <p class="alert alert-primary">
                     <?php foreach ($patterns as $pattern) : ?>
                         <?php echo $pattern['value']; ?> |
                     <?php endforeach; ?>
                 </p>
+                <?php endif; ?>
                 <?php echo form_open("lp_csv/submit", array("role" => "form", "class" => "form"), array("uri_string" => uri_string())); ?>
                 <div class="table-responsive">
                     <table class="table table-sm table-bordered table-condensed">
@@ -116,7 +163,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                             <th>Content</th>
                             <th>Status Code</th>
                             <th>Status</th>
-                            <th>Title 1</th>
+                            <th>BreadCrumb1</th>
+                            <th>BreadCrumb2</th>
+                            <th>BreadCrumb3</th>
+                            <th>BreadCrumb4</th>
+                            <th>BreadCrumb5</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -131,7 +182,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                 <td><?php echo $row['Content']; ?></td>
                                 <td><?php echo $row['Status Code']; ?></td>
                                 <td><?php echo $row['Status']; ?></td>
-                                <td><?php echo $row['Title 1']; ?></td>
+                                <td><?php echo (isset($this->session->columns['breadcrumb1'])) ? $row[$this->session->columns['breadcrumb1']] : '&nbsp;'; ?></td>
+                                <td><?php echo (isset($this->session->columns['breadcrumb2'])) ? $row[$this->session->columns['breadcrumb2']] : '&nbsp;'; ?></td>
+                                <td><?php echo (isset($this->session->columns['breadcrumb3'])) ? $row[$this->session->columns['breadcrumb3']] : '&nbsp;'; ?></td>
+                                <td><?php echo (isset($this->session->columns['breadcrumb4'])) ? $row[$this->session->columns['breadcrumb4']] : '&nbsp;'; ?></td>
+                                <td><?php echo (isset($this->session->columns['breadcrumb5'])) ? $row[$this->session->columns['breadcrumb5']] : '&nbsp;'; ?></td>
                             </tr>
                         <?php endforeach; ?>
                         </tbody>
@@ -142,15 +197,20 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             </div>
             <?php echo form_close(); ?>
             <?php endif; ?>
+            <!-- //プレビュー -->
 
+            <!-- プレビュー Googleキャッシュ -->
             <?php if (isset($rowdatacache)) : ?>
+                <h2>登録行の確認</h2>
                 <p>登録しないデータ行は、チェックを外して下さい。</p>
+                <?php if (count($patterns) > 0) : ?>
                 <p>以下のパターンに一致した行は省かれています。</p>
                 <p class="alert alert-primary">
                     <?php foreach ($patterns as $pattern) : ?>
                         <?php echo $pattern['value']; ?> |
                     <?php endforeach; ?>
                 </p>
+                <?php endif; ?>
                 <?php echo form_open("lp_csv/submitcache", array("role" => "form", "class" => "form"), array("uri_string" => uri_string())); ?>
                 <div class="table-responsive">
                     <table class="table table-sm table-bordered table-condensed">
@@ -181,6 +241,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 </div>
                 <?php echo form_close(); ?>
             <?php endif; ?>
+            <!-- //プレビュー Googleキャッシュ -->
         </div>
     </div>
     <div class="row" id="footer">

@@ -55,6 +55,7 @@ class Lp_csv extends CI_Controller
     {
         $this->data['title'] = 'CSVファイル';
 
+        $this->data['disp'] = 'form';
         // ページを表示
         $this->load->view('_header', $this->data);
         $this->load->view('lp_csv', $this->data);
@@ -118,13 +119,14 @@ class Lp_csv extends CI_Controller
 
             switch ($filetype) {
                 case "csv":
+                    $headline = $this->excel_model->csvheadread($full_path);
                     $rowdata = $this->excel_model->csvread($full_path);
                     break;
                 case "xlsx":
+                    $headline = $this->excel_model->headread($full_path,1);
                     $rowdata = $this->excel_model->read($full_path);
                     break;
             }
-
 
             // 除外パターン
             $wheredata[] = array('kind' => 'where', 'field_name' => 'site_id', 'value' => $site_id);
@@ -134,9 +136,65 @@ class Lp_csv extends CI_Controller
             // パターンマッチ
             $rowdata = $this->lowpages_model->pattern_match($rowdata, $patterns);
 
+            // 必須パラメータ
+            $params = array(
+                'Address',
+                'Content',
+                'Title 1'
+            );
+
+            $this->data['params'] = $params;
+            $this->data['headline'] = $headline;
             $this->data['patterns'] = $patterns;
-            $this->data['rowdata'] = $rowdata;
+            $this->data['previewdata'] = $rowdata;
         }
+
+        // ページを表示
+        $this->load->view('_header', $this->data);
+        $this->load->view('lp_csv', $this->data);
+        $this->load->view('_footer', $this->data);
+    }
+
+    public function preview()
+    {
+        if ( ! isset($this->session->file_type, $this->session->full_path, $this->session->site_id))
+        {
+            redirect('lp_csv');
+        }
+
+        switch ($this->session->file_type) {
+            case "csv":
+                $rowdata = $this->excel_model->csvread($this->session->full_path);
+                break;
+            case "xlsx":
+                $rowdata = $this->excel_model->read($this->session->full_path);
+                break;
+        }
+
+        // 選択カラムの保持
+        $posts = $this->input->post(NULL,TRUE);
+        $columns = array();
+        foreach ($posts as $key => $val)
+        {
+            if (strpos($key, 'col_') !== FALSE && $val !== "-none-")
+            {
+                $valsplit = explode("--", $val, 2);
+                $columns[$valsplit[0]] = $valsplit[1];
+            }
+        }
+        unset($key,$val);
+        $this->session->columns = $columns;
+
+        // 除外パターン
+        $wheredata[] = array('kind' => 'where', 'field_name' => 'site_id', 'value' => $this->session->site_id);
+        $wheredata[] = array('kind' => 'where', 'field_name' => 'name', 'value' => 'pattern');
+        $patterns = $this->lowpages_model->setting_load($wheredata);
+
+        // パターンマッチ
+        $rowdata = $this->lowpages_model->pattern_match($rowdata, $patterns);
+
+        $this->data['patterns'] = $patterns;
+        $this->data['rowdata'] = $rowdata;
 
         // ページを表示
         $this->load->view('_header', $this->data);

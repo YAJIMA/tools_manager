@@ -525,6 +525,16 @@ class Lowpages_model extends CI_Model
             {
                 $rowvalues['response_time'] = $row['Response Time'];
             }
+
+            if (isset($this->session->columns))
+            {
+                foreach ($this->session->columns as $key => $val)
+                {
+                    $rowvalues[$key] = $row[$val];
+                }
+                unset($key,$val);
+            }
+
             $rowvalues['upload_datetime'] = date("Y-m-d H:i:s");
             $rowvalues['site_id'] = $site_id;
 
@@ -582,7 +592,31 @@ class Lowpages_model extends CI_Model
 
     /**
      * @param $site_id
+     * @return array
+     */
+    public function build_directories($site_id)
+    {
+        $result = array();
+
+        // クエリビルダ
+        $this->db->select('lowpages.breadcrumb1, lowpages.breadcrumb2, lowpages.breadcrumb3, lowpages.breadcrumb4, lowpages.breadcrumb5, CONCAT(IFNULL(tm_lowpages.breadcrumb1,""),IFNULL(tm_lowpages.breadcrumb2,""),IFNULL(tm_lowpages.breadcrumb3,""),IFNULL(tm_lowpages.breadcrumb4,""),IFNULL(tm_lowpages.breadcrumb5,"")) AS breadcrumb');
+        $this->db->from('lowpages');
+        $this->db->where('lowpages.site_id', $site_id);
+        $this->db->group_by('breadcrumb');
+        $this->db->order_by('lowpages.address','ASC');
+
+        // クエリ実行
+        $query = $this->db->get();
+
+        // 結果を配列で取得
+        $result = $query->result_array();
+
+        return $result;
+    }
+    /**
+     * @param $site_id
      * @param int $indexmonth
+     * @param string $directory
      * @return array
      */
     public function build_report($site_id, $indexmonth = INDEXMONTH, $directory = NULL)
@@ -595,7 +629,7 @@ class Lowpages_model extends CI_Model
         // 施策	URL	ディレクトリ	更新日	Googleキャッシュ日	2018/04/12	2018/03/13	2018/02/13	2018/01/06	2017/12/04
 
         // クエリビルダ
-        $this->db->select('lowpages.id, lowpages.site_id, lowpages.address, lowpages.title, lowpages.upload_datetime, lowpages.cache_datetime, lowpages.update_datetime, sites.name, sites.url, icbs.indexcheck, icbs.yyyymm');
+        $this->db->select('lowpages.id, lowpages.site_id, lowpages.address, lowpages.title, lowpages.upload_datetime, lowpages.cache_datetime, lowpages.update_datetime, lowpages.breadcrumb1, lowpages.breadcrumb2, lowpages.breadcrumb3, lowpages.breadcrumb4, lowpages.breadcrumb5, CONCAT(IFNULL(tm_lowpages.breadcrumb1,""),IFNULL(tm_lowpages.breadcrumb2,""),IFNULL(tm_lowpages.breadcrumb3,""),IFNULL(tm_lowpages.breadcrumb4,""),IFNULL(tm_lowpages.breadcrumb5,"")) AS breadcrumb, sites.name, sites.url, icbs.indexcheck, icbs.yyyymm');
         $this->db->from('lowpages');
         $this->db->join('sites','sites.id = lowpages.site_id','left');
         $this->db->join('icbs','icbs.lowpage_id = lowpages.id','left');
@@ -603,10 +637,12 @@ class Lowpages_model extends CI_Model
         $this->db->where('icbs.yyyymm >', $olderdate);
         if ( ! empty($directory))
         {
-            $this->db->like('address', $directory);
+            $this->db->like('CONCAT(IFNULL(tm_lowpages.breadcrumb1,""),IFNULL(tm_lowpages.breadcrumb2,""),IFNULL(tm_lowpages.breadcrumb3,""),IFNULL(tm_lowpages.breadcrumb4,""),IFNULL(tm_lowpages.breadcrumb5,""))', $directory, 'after');
         }
         $this->db->order_by('lowpages.address','ASC');
         $this->db->order_by('icbs.yyyymm','DESC');
+
+        //var_dump($this->db->get_compiled_select());exit();
 
         // クエリ実行
         $query = $this->db->get();
@@ -628,6 +664,12 @@ class Lowpages_model extends CI_Model
                     'path' => $path,
                     'directory' => $directory,
                     'title' => $row['title'],
+                    'breadcrumb' => $row['breadcrumb'],
+                    'breadcrumb1' => $row['breadcrumb1'],
+                    'breadcrumb2' => $row['breadcrumb2'],
+                    'breadcrumb3' => $row['breadcrumb3'],
+                    'breadcrumb4' => $row['breadcrumb4'],
+                    'breadcrumb5' => $row['breadcrumb5'],
                     'upload_datetime' => $row['upload_datetime'],
                     'cache_datetime' => $row['cache_datetime'],
                     'update_datetime' => $row['update_datetime'],

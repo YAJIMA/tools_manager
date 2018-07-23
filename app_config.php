@@ -15,13 +15,19 @@
 $indexmonth = 12;
 
 // Googleキャッシュ日からの経過日数（日）
+// 優先度：高
 $google_cache_days0 = 40;
+// 優先度：中
 $google_cache_days1 = 40;
+// 優先度：低
 $google_cache_days2 = 40;
 
 // So-netインデックスチェック
+// 優先度：高
 $index_check0 = 0;
+// 優先度：中
 $index_check1 = 2;
+// 優先度：低
 $index_check2 = 1;
 
 // 優先度のチェックボックス

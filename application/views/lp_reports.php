@@ -23,8 +23,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             <h3>階層で絞り込み</h3>
                 <p>階層（ディレクトリ）でレポートを絞り込み表示できます。<br>階層を選んでください。</p>
             <div class="list-group">
-                <?php foreach ($directories as $d) : ?>
-                    <a href="<?php echo base_url('lp_reports/site/'.$this->session->site_id.'/'.dir2path($d,'__')); ?>" class="list-group-item"><?php echo $d; ?></a>
+                <a href="<?php echo base_url('lp_reports/site/'.$this->session->site_id.'/__'); ?>" class="list-group-item">絞り込みしない（全て表示）</a>
+                <?php foreach ($directories as $key => $val) : ?>
+                    <a href="<?php echo base_url('lp_reports/site/'.$this->session->site_id.'/'.$key); ?>" class="list-group-item"><?php echo $val['path']; ?></a>
                 <?php endforeach; ?>
             </div>
             <?php endif; ?>
@@ -50,11 +51,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                     <td><?php echo $operations[$report['operation']]; ?></td>
                     <td><?php echo $report['path']; ?></td>
                     <td>
-                        <?php if ($report['directory'] !== "/") : ?>
-                            <a href="<?php echo base_url('lp_reports/site/'.$this->session->site_id.'/'.dir2path($report['directory'],'__')); ?>"><?php echo $report['directory']; ?></a>
-                        <?php else : ?>
-                            <?php echo $report['directory']; ?>
-                        <?php endif; ?>
+                        <a href="<?php echo base_url('lp_reports/site/'.$this->session->site_id.'/'.$report['breadcrumb']); ?>">
+                            <?php echo $directories[$report['breadcrumb']]['path']; ?>
+                        </a>
                     </td>
                     <td><?php echo $report['title']; ?></td>
                     <td><?php echo $report['upload_datetime']; ?></td>

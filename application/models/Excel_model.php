@@ -353,7 +353,7 @@ class Excel_model extends CI_Model
                 $sheet->setCellValue('A'.$startRow, $operations[$val['operation']]);
 
                 $sheet->setCellValue('B'.$startRow, $val['path']);
-                $sheet->setCellValue('C'.$startRow, $val['directory']);
+                $sheet->setCellValue('C'.$startRow, $val['breadcrumb']);
                 $sheet->setCellValue('D'.$startRow, $val['title']);
                 $sheet->setCellValue('E'.$startRow, $val['upload_datetime']);
                 $sheet->setCellValue('F'.$startRow, $val['cache_datetime']);
@@ -475,6 +475,32 @@ class Excel_model extends CI_Model
         }
 
         return $results;
+    }
+
+    // Excelファイルのヘッダー読み込み
+    public  function headread($filename = NULL, $row = 1)
+    {
+        $reader = new PhpOffice\PhpSpreadsheet\Reader\Xlsx();
+        $spreadsheet = $reader->load($filename);
+        $sheet = $spreadsheet->getActiveSheet();
+        $records = $sheet->toArray(); // これで表の2次元配列が得られます。
+        $rowArray = array();
+
+        $head = $records[$row];
+
+        return $head;
+    }
+
+    // CSVファイルのヘッダー読み込み
+    public function csvheadread($filename = NULL)
+    {
+
+        $csv = Reader::createFromPath($filename, 'r');
+        $csv->setHeaderOffset(0); //set the CSV header offset
+
+        $records = $csv->getRecords();
+
+        return $records[0];
     }
 
     // Excelファイルの読み込み

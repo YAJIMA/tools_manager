@@ -54,7 +54,7 @@ class Lp_reports extends CI_Controller {
 
 	    if (isset($this->session->site_id))
         {
-            redirect('lp_reports/site/'.$this->session->site_id);
+            redirect('lp_reports/site/'.$this->session->site_id.'/__');
         }
 	    // ページを表示
         $this->load->view('_header', $this->data);
@@ -64,8 +64,16 @@ class Lp_reports extends CI_Controller {
 
 	public  function site($site_id = 0, $directory = NULL)
     {
+        if (empty($directory))
+        {
+            redirect('lp_reports/site/'.$site_id.'/__');
+        }
+
         // エクセルモデル
         $this->load->model('excel_model');
+
+        // ページネーションライブラリをロード
+        $this->load->library('pagination');
 
         // セッションに現在見ているサイトIDを登録
         $this->session->site_id = $site_id;
@@ -103,9 +111,9 @@ class Lp_reports extends CI_Controller {
         }
         $this->data['indexmonth'] = $indexmonth;
 
-        if ( ! empty($directory))
+        if ($directory !== NULL && $directory !== "__")
         {
-            $dir = path2directory($directory, '__');
+            $dir = urldecode($directory);
         }
         else
         {
@@ -114,22 +122,28 @@ class Lp_reports extends CI_Controller {
         $this->data['reports'] = $reports = $this->lowpages_model->build_report($this->session->site_id, $indexmonth, $dir);
 
         // 階層の作成
-        if ($directory == NULL)
+        $directories = array();
+        $directories_data = $this->lowpages_model->build_directories($this->session->site_id);
+
+        foreach ($directories_data as $val)
         {
-            $directories = array();
-            foreach ($reports as $report)
-            {
-                if ( ! empty($report['directory']) && $report['directory'] !== "/")
-                {
-                    if ( ! in_array($report['directory'],$directories))
-                    {
-                        $directories[] = $report['directory'];
-                    }
-                }
-            }
-            unset($report);
-            $this->data['directories'] = $directories;
+            $path = $val['breadcrumb1'];
+            $path .= ( ! empty($val['breadcrumb2'])) ? '&nbsp;&gt;&nbsp;'.$val['breadcrumb2'] : '';
+            $path .= ( ! empty($val['breadcrumb3'])) ? '&nbsp;&gt;&nbsp;'.$val['breadcrumb3'] : '';
+            $path .= ( ! empty($val['breadcrumb4'])) ? '&nbsp;&gt;&nbsp;'.$val['breadcrumb4'] : '';
+            $path .= ( ! empty($val['breadcrumb5'])) ? '&nbsp;&gt;&nbsp;'.$val['breadcrumb5'] : '';
+
+            $directories[$val['breadcrumb']] = array(
+                'breadcrumb1' => $val['breadcrumb1'],
+                'breadcrumb2' => $val['breadcrumb2'],
+                'breadcrumb3' => $val['breadcrumb3'],
+                'breadcrumb4' => $val['breadcrumb4'],
+                'breadcrumb5' => $val['breadcrumb5'],
+                'path' => $path
+            );
         }
+
+        $this->data['directories'] = $directories;
 
         // エクセルファイルを作成
         try
