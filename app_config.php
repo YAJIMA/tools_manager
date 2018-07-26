@@ -11,6 +11,9 @@
  * 設定はここから
  */
 
+// 1ページに表示する行数
+$page_max = 10;
+
 // インデックスチェック履歴の保存数（月）
 $indexmonth = 12;
 
@@ -54,7 +57,7 @@ $db_collation = 'utf8_general_ci';
  * 設定はここまで
  */
 
-
+defined('PAGEMAX') OR define('PAGEMAX', $page_max);
 defined('INDEXMONTH') OR define('INDEXMONTH', $indexmonth);
 defined('GOOGLECACHEDAYS0') OR define('GOOGLECACHEDAYS0', $google_cache_days0);
 defined('GOOGLECACHEDAYS1') OR define('GOOGLECACHEDAYS1', $google_cache_days1);

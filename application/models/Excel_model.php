@@ -15,11 +15,23 @@ class Excel_model extends CI_Model
 {
 
     // レポートのExcel書き出し
-    public function write_reports($data = NULL, $priority_data = NULL)
+    public function write_reports($data = NULL, $priority_data = NULL, $filename = NULL)
     {
 
         // 出力ファイルパス
-        $filename = BASEPATH . '../outputs/' . 'reports-' . date("YmdHis") . '.xlsx';
+        if ( ! empty($filename))
+        {
+            $filename = BASEPATH . '../outputs/' . $filename;
+        }
+        else
+        {
+            $filename = BASEPATH . '../outputs/' . 'reports-' . date("YmdHis") . '.xlsx';
+        }
+
+        if (file_exists($filename))
+        {
+            return FALSE;
+        }
 
         // ファイル作成
         $spreadsheet = new PhpOffice\PhpSpreadsheet\Spreadsheet();

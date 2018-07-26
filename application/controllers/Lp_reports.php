@@ -62,7 +62,7 @@ class Lp_reports extends CI_Controller {
         $this->load->view('_footer', $this->data);
 	}
 
-	public  function site($site_id = 0, $directory = NULL)
+	public  function site($site_id = 0, $directory = '__', $page = 0)
     {
         if (empty($directory))
         {
@@ -119,7 +119,38 @@ class Lp_reports extends CI_Controller {
         {
             $dir = NULL;
         }
-        $this->data['reports'] = $reports = $this->lowpages_model->build_report($this->session->site_id, $indexmonth, $dir);
+        $this->data['reports'] = $reports = $this->lowpages_model->build_report($this->session->site_id, $indexmonth, $dir, $page, PAGEMAX);
+
+        // ページネーション
+        $this->load->library('pagination');
+        $config['base_url'] = base_url('lp_reports/site/'.$site_id.'/'.$directory.'/');
+        $config['total_rows'] = $this->lowpages_model->count_report($this->session->site_id, $indexmonth, $dir);
+        $config['per_page'] = PAGEMAX;
+        $config['full_tag_open'] = '<nav aria-label="Reports navigation"><ul class="pagination justify-content-center">';
+        $config['full_tag_close'] = '</ul></nav>';
+        $config['num_tag_open'] = '<li class="page-item">';
+        $config['num_tag_close'] = '</li>';
+        $config['cur_tag_open'] = '<li class="page-item active"><a href="#" class="page-link">';
+        $config['cur_tag_close'] = '</a></li>';
+        $config['prev_link'] = '&lt;';
+        $config['prev_tag_open'] = '<li class="page-item">';
+        $config['prev_tag_close'] = '</li>';
+        $config['next_link'] = '&gt;';
+        $config['next_tag_open'] = '<li class="page-item">';
+        $config['next_tag_close'] = '</li>';
+        $config['first_link'] = '|&lt;';
+        $config['first_tag_open'] = '<li class="page-item">';
+        $config['first_tag_close'] = '</li>';
+        $config['last_link'] = '&gt;|';
+        $config['last_tag_open'] = '<li class="page-item">';
+        $config['last_tag_close'] = '</li>';
+        $config['attributes'] = array('class' => 'page-link');
+
+        $this->pagination->initialize($config);
+
+        $this->data['pagination'] = $this->pagination->create_links();
+        $this->data['pages'] = ceil($config['total_rows'] / PAGEMAX);
+        $this->data['cur_page'] = $page / PAGEMAX + 1;
 
         // 階層の作成
         $directories = array();
@@ -146,13 +177,24 @@ class Lp_reports extends CI_Controller {
         $this->data['directories'] = $directories;
 
         // エクセルファイルを作成
-        try
+        $template = 'reports-s%s-%s-%s.xlsx';
+        $filename = sprintf($template, $site_id, $directory, date("Ymd"));
+        if (file_exists(BASEPATH . '../outputs/' . $filename))
         {
-            $this->data['excelfile'] = $this->excel_model->write_reports($reports, $priority_data);
+            $this->data['excelfile'] = $filename;
         }
-        catch (Exception $e)
+        else
         {
-            $this->data['excelfile'] = $e->getMessage();
+            $reports_all = $this->lowpages_model->build_report($this->session->site_id, $indexmonth, $dir, 0, 0);
+
+            try
+            {
+                $this->data['excelfile'] = $this->excel_model->write_reports($reports_all, $priority_data, $filename);
+            }
+            catch (Exception $e)
+            {
+                $this->data['excelfile'] = $e->getMessage();
+            }
         }
 
         // ページを表示

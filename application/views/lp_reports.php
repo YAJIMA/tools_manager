@@ -29,6 +29,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 <?php endforeach; ?>
             </div>
             <?php endif; ?>
+            <div class="text-center">
+                <?php echo $pagination; ?>
+                <p><?php echo $pages; ?>ページ中<?php echo $cur_page; ?>ページを表示</p>
+            </div>
             <table class="table table-striped">
                 <thead>
                 <tr>
@@ -70,6 +74,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 <?php endforeach; ?>
                 </tbody>
             </table>
+            <div class="text-center">
+                <?php echo $pagination; ?>
+                <p><?php echo $pages; ?>ページ中<?php echo $cur_page; ?>ページを表示</p>
+            </div>
             <?php else : ?>
             <p>サイトを選んで下さい。</p>
                 <?php if (isset($site_menues['site_item'])) : ?>

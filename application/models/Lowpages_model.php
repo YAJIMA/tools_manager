@@ -613,13 +613,37 @@ class Lowpages_model extends CI_Model
 
         return $result;
     }
+
+    /**
+     * @param $site_id
+     * @param int $indexmonth
+     * @param null $directory
+     * @return mixed
+     */
+    public function count_report($site_id, $indexmonth = INDEXMONTH, $directory = NULL)
+    {
+        $olderdate = date('Ym', strtotime("-".$indexmonth." month"));
+
+        // クエリビルダ
+        $this->db->from('lowpages');
+        $this->db->join('sites','sites.id = lowpages.site_id','left');
+        $this->db->where('lowpages.site_id', $site_id);
+        if ( ! empty($directory))
+        {
+            $this->db->like('CONCAT(IFNULL(tm_lowpages.breadcrumb1,""),IFNULL(tm_lowpages.breadcrumb2,""),IFNULL(tm_lowpages.breadcrumb3,""),IFNULL(tm_lowpages.breadcrumb4,""),IFNULL(tm_lowpages.breadcrumb5,""))', $directory, 'after');
+        }
+        $this->db->order_by('lowpages.address','ASC');
+
+        return $this->db->count_all_results();
+    }
+
     /**
      * @param $site_id
      * @param int $indexmonth
      * @param string $directory
      * @return array
      */
-    public function build_report($site_id, $indexmonth = INDEXMONTH, $directory = NULL)
+    public function build_report($site_id, $indexmonth = INDEXMONTH, $directory = NULL, $index = 0, $limit = PAGEMAX)
     {
         $result = array();
         $cols = array();
@@ -629,18 +653,20 @@ class Lowpages_model extends CI_Model
         // 施策	URL	ディレクトリ	更新日	Googleキャッシュ日	2018/04/12	2018/03/13	2018/02/13	2018/01/06	2017/12/04
 
         // クエリビルダ
-        $this->db->select('lowpages.id, lowpages.site_id, lowpages.address, lowpages.title, lowpages.upload_datetime, lowpages.cache_datetime, lowpages.update_datetime, lowpages.breadcrumb1, lowpages.breadcrumb2, lowpages.breadcrumb3, lowpages.breadcrumb4, lowpages.breadcrumb5, CONCAT(IFNULL(tm_lowpages.breadcrumb1,""),IFNULL(tm_lowpages.breadcrumb2,""),IFNULL(tm_lowpages.breadcrumb3,""),IFNULL(tm_lowpages.breadcrumb4,""),IFNULL(tm_lowpages.breadcrumb5,"")) AS breadcrumb, sites.name, sites.url, icbs.indexcheck, icbs.yyyymm');
+        $this->db->select('lowpages.id, lowpages.site_id, lowpages.address, lowpages.title, lowpages.upload_datetime, lowpages.cache_datetime, lowpages.update_datetime, lowpages.breadcrumb1, lowpages.breadcrumb2, lowpages.breadcrumb3, lowpages.breadcrumb4, lowpages.breadcrumb5, CONCAT(IFNULL(tm_lowpages.breadcrumb1,""),IFNULL(tm_lowpages.breadcrumb2,""),IFNULL(tm_lowpages.breadcrumb3,""),IFNULL(tm_lowpages.breadcrumb4,""),IFNULL(tm_lowpages.breadcrumb5,"")) AS breadcrumb, sites.name, sites.url');
         $this->db->from('lowpages');
         $this->db->join('sites','sites.id = lowpages.site_id','left');
-        $this->db->join('icbs','icbs.lowpage_id = lowpages.id','left');
         $this->db->where('lowpages.site_id', $site_id);
-        $this->db->where('icbs.yyyymm >', $olderdate);
         if ( ! empty($directory))
         {
             $this->db->like('CONCAT(IFNULL(tm_lowpages.breadcrumb1,""),IFNULL(tm_lowpages.breadcrumb2,""),IFNULL(tm_lowpages.breadcrumb3,""),IFNULL(tm_lowpages.breadcrumb4,""),IFNULL(tm_lowpages.breadcrumb5,""))', $directory, 'after');
         }
         $this->db->order_by('lowpages.address','ASC');
-        $this->db->order_by('icbs.yyyymm','DESC');
+
+        if ($limit > 0)
+        {
+            $this->db->limit($limit, $index);
+        }
 
         //var_dump($this->db->get_compiled_select());exit();
 
@@ -652,43 +678,57 @@ class Lowpages_model extends CI_Model
 
         foreach ($rows as $row)
         {
-            if ( ! isset($result[$row['id']]) )
-            {
-                $path = str_replace($row['url'], '', $row['address']);
-                $directory = dirname($path);
+            // インデックスチェックを検索
+            $this->db->select('icbs.indexcheck, icbs.yyyymm');
+            $this->db->from('icbs');
+            $this->db->where('icbs.lowpage_id', $row['id']);
+            $this->db->where('icbs.yyyymm >', $olderdate);
+            $this->db->order_by('icbs.yyyymm','DESC');
 
-                $result[$row['id']] = array(
-                    'id' => $row['id'],
-                    'site_id' => $row['site_id'],
-                    'address' => $row['address'],
-                    'path' => $path,
-                    'directory' => $directory,
-                    'title' => $row['title'],
-                    'breadcrumb' => $row['breadcrumb'],
-                    'breadcrumb1' => $row['breadcrumb1'],
-                    'breadcrumb2' => $row['breadcrumb2'],
-                    'breadcrumb3' => $row['breadcrumb3'],
-                    'breadcrumb4' => $row['breadcrumb4'],
-                    'breadcrumb5' => $row['breadcrumb5'],
-                    'upload_datetime' => $row['upload_datetime'],
-                    'cache_datetime' => $row['cache_datetime'],
-                    'update_datetime' => $row['update_datetime'],
-                    'indexchecks' => array(
-                        $row['yyyymm'] => $row['indexcheck']
-                    )
-                );
-            }
-            else
+            // クエリ実行
+            $query2 = $this->db->get();
+
+            // 結果を配列で取得
+            $rows2 = $query2->result_array();
+
+            $indexchecks = array();
+
+            foreach ($rows2 as $row2)
             {
-                $result[$row['id']]['indexchecks'][$row['yyyymm']] = $row['indexcheck'];
+                $indexchecks[$row2['yyyymm']] = $row2['indexcheck'];
+
+                if ( ! in_array($row2['yyyymm'], $cols))
+                {
+                    $cols[] = $row2['yyyymm'];
+                }
             }
 
-            if ( ! in_array($row['yyyymm'], $cols))
-            {
-                $cols[] = $row['yyyymm'];
-            }
+            $path = str_replace($row['url'], '', $row['address']);
+            $directory = dirname($path);
+
+            $result[$row['id']] = array(
+                'id' => $row['id'],
+                'site_id' => $row['site_id'],
+                'address' => $row['address'],
+                'path' => $path,
+                'directory' => $directory,
+                'title' => $row['title'],
+                'breadcrumb' => $row['breadcrumb'],
+                'breadcrumb1' => $row['breadcrumb1'],
+                'breadcrumb2' => $row['breadcrumb2'],
+                'breadcrumb3' => $row['breadcrumb3'],
+                'breadcrumb4' => $row['breadcrumb4'],
+                'breadcrumb5' => $row['breadcrumb5'],
+                'upload_datetime' => $row['upload_datetime'],
+                'cache_datetime' => $row['cache_datetime'],
+                'update_datetime' => $row['update_datetime'],
+                'indexchecks' => $indexchecks
+            );
+
         }
         unset($row);
+
+        // var_dump($result);exit();
 
         // 施策
         // 優先度パターン
@@ -719,9 +759,9 @@ class Lowpages_model extends CI_Model
                     $i += 10;
                     $index_month = $priorities['index_check'][$m];
                     $k = $l = 0;
-                    foreach ($val['indexchecks'] as $item)
+                    foreach ($val['indexchecks'] as $yyyymm => $indexcheck)
                     {
-                        $k += $item;
+                        $k += $indexcheck;
                         $l++;
                         if ($l == $index_month)
                         {
