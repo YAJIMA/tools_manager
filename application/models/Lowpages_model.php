@@ -643,7 +643,7 @@ class Lowpages_model extends CI_Model
      * @param string $directory
      * @return array
      */
-    public function build_report($site_id, $indexmonth = INDEXMONTH, $directory = NULL, $index = 0, $limit = PAGEMAX)
+    public function build_report($site_id, $indexmonth = INDEXMONTH, $directory = NULL, $sortcol = 'lowpages.address', $sortasc = 'ASC', $index = 0, $limit = PAGEMAX)
     {
         $result = array();
         $cols = array();
@@ -661,7 +661,7 @@ class Lowpages_model extends CI_Model
         {
             $this->db->like('CONCAT(IFNULL(tm_lowpages.breadcrumb1,""),IFNULL(tm_lowpages.breadcrumb2,""),IFNULL(tm_lowpages.breadcrumb3,""),IFNULL(tm_lowpages.breadcrumb4,""),IFNULL(tm_lowpages.breadcrumb5,""))', $directory, 'after');
         }
-        $this->db->order_by('lowpages.address','ASC');
+        $this->db->order_by($sortcol, $sortasc);
 
         if ($limit > 0)
         {

@@ -62,7 +62,7 @@ class Lp_reports extends CI_Controller {
         $this->load->view('_footer', $this->data);
 	}
 
-	public  function site($site_id = 0, $directory = '__', $page = 0)
+	public  function site($site_id = 0, $directory = '__', $sort = 'url_a', $page = 0)
     {
         if (empty($directory))
         {
@@ -119,11 +119,59 @@ class Lp_reports extends CI_Controller {
         {
             $dir = NULL;
         }
-        $this->data['reports'] = $reports = $this->lowpages_model->build_report($this->session->site_id, $indexmonth, $dir, $page, PAGEMAX);
+
+        $this->data['directory'] = $directory;
+
+        switch ($sort)
+        {
+            case "gcache_d":
+                $sortcol = 'lowpages.cache_datetime';
+                $sortasc = 'DESC';
+                break;
+            case "gcache_a":
+                $sortcol = 'lowpages.cache_datetime';
+                $sortasc = 'ASC';
+                break;
+            case "update_d":
+                $sortcol = 'lowpages.update_datetime';
+                $sortasc = 'DESC';
+                break;
+            case "update_a":
+                $sortcol = 'lowpages.update_datetime';
+                $sortasc = 'ASC';
+                break;
+            case "title_d":
+                $sortcol = 'lowpages.title';
+                $sortasc = 'DESC';
+                break;
+            case "title_a":
+                $sortcol = 'lowpages.title';
+                $sortasc = 'ASC';
+                break;
+            case "dir_d":
+                $sortcol = 'breadcrumb';
+                $sortasc = 'DESC';
+                break;
+            case "dir_a":
+                $sortcol = 'breadcrumb';
+                $sortasc = 'ASC';
+                break;
+            case "url_d":
+                $sortcol = 'lowpages.address';
+                $sortasc = 'DESC';
+                break;
+            case "url_a":
+            default:
+                $sortcol = 'lowpages.address';
+                $sortasc = 'ASC';
+                break;
+        }
+
+        $this->data['reports'] = $reports = $this->lowpages_model->build_report($this->session->site_id, $indexmonth, $dir, $sortcol, $sortasc, $page, PAGEMAX);
 
         // ページネーション
         $this->load->library('pagination');
-        $config['base_url'] = base_url('lp_reports/site/'.$site_id.'/'.$directory.'/');
+        $config['base_url'] = base_url('lp_reports/site/'.$site_id.'/'.$directory.'/'.$sort.'/');
         $config['total_rows'] = $this->lowpages_model->count_report($this->session->site_id, $indexmonth, $dir);
         $config['per_page'] = PAGEMAX;
         $config['full_tag_open'] = '<nav aria-label="Reports navigation"><ul class="pagination justify-content-center">';
