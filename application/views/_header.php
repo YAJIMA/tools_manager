@@ -59,6 +59,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                     </li>
                 <?php endif; ?>
             </ul>
+            <?php if (isset($this->session->username)) : ?>
+                <span class="navbar-text">
+                    <?php echo $this->session->username; ?>
+                </span>
+            <?php endif; ?>
             <ul class="navbar-nav justify-content-end">
                 <li class="nav-item">
                     <a class="nav-link text-danger" href="<?php echo base_url('login/out'); ?>">ログアウト</a>
