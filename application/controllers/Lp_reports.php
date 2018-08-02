@@ -13,6 +13,7 @@ class Lp_reports extends CI_Controller {
 
     public $data = array();
     public $sites = array();
+    public $pagemax = PAGEMAX;
 
     public function __construct()
     {
@@ -46,6 +47,17 @@ class Lp_reports extends CI_Controller {
         // TODO: メニュー
         $menues = $this->menues_model->load($this->session->users['status'], 'lowpages', 'lp_reports');
         $this->data['menues'] = $menues;
+
+        // ページ件数
+        $pagemax = PAGEMAX;
+        if ( ! empty($this->input->post('limit')))
+        {
+            $this->session->limit = $this->input->post('limit');
+        }
+        if (isset($this->session->limit))
+        {
+            $this->pagemax = $this->session->limit;
+        }
     }
 
     public function index()
@@ -167,13 +179,14 @@ class Lp_reports extends CI_Controller {
                 break;
         }
 
-        $this->data['reports'] = $reports = $this->lowpages_model->build_report($this->session->site_id, $indexmonth, $dir, $sortcol, $sortasc, $page, PAGEMAX);
+
+        $this->data['reports'] = $reports = $this->lowpages_model->build_report($this->session->site_id, $indexmonth, $dir, $sortcol, $sortasc, $page, $this->pagemax);
 
         // ページネーション
         $this->load->library('pagination');
         $config['base_url'] = base_url('lp_reports/site/'.$site_id.'/'.$directory.'/'.$sort.'/');
         $config['total_rows'] = $this->lowpages_model->count_report($this->session->site_id, $indexmonth, $dir);
-        $config['per_page'] = PAGEMAX;
+        $config['per_page'] = $this->pagemax;
         $config['full_tag_open'] = '<nav aria-label="Reports navigation"><ul class="pagination justify-content-center">';
         $config['full_tag_close'] = '</ul></nav>';
         $config['num_tag_open'] = '<li class="page-item">';
@@ -197,8 +210,8 @@ class Lp_reports extends CI_Controller {
         $this->pagination->initialize($config);
 
         $this->data['pagination'] = $this->pagination->create_links();
-        $this->data['pages'] = ceil($config['total_rows'] / PAGEMAX);
-        $this->data['cur_page'] = $page / PAGEMAX + 1;
+        $this->data['pages'] = ceil($config['total_rows'] / $this->pagemax);
+        $this->data['cur_page'] = $page / $this->pagemax + 1;
 
         // 階層の作成
         $directories = array();

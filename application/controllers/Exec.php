@@ -127,10 +127,7 @@ class Exec extends CI_Controller {
 
         if ( ! is_cli())
         {
-            $response .= '<br>
-            <a href="'.current_url().'">もう一度実行</a><br>
-            終了する場合は、タブ（ウィンドウ）を閉じて下さい。
-            ';
+            $response .= '<br><a href="'.current_url().'">もう一度実行</a><br>終了する場合は、タブ（ウィンドウ）を閉じて下さい。';
             echo $response;
         }
     }

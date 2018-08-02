@@ -313,23 +313,23 @@ class Excel_model extends CI_Model
         }
 
         // TODO: タイトル行の書き込み
-        $styleArray = [
-            'font' => [
+        $styleArray = array(
+            'font' => array(
                 'bold' => true,
-                'color' => [
+                'color' => array(
                     'argb' => 'FFFFFFFF',
-                ],
-            ],
-            'fill' => [
+                ),
+            ),
+            'fill' => array(
                 'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                'startColor' => [
+                'startColor' => array(
                     'argb' => 'FF000000',
-                ],
-                'endColor' => [
+                ),
+                'endColor' => array(
                     'argb' => 'FF000000',
-                ],
-            ],
-        ];
+                ),
+            ),
+        );
 
         $sheet->setCellValue('A4','施策');
         $sheet->setCellValue('B4','URL');
@@ -376,7 +376,7 @@ class Excel_model extends CI_Model
                     $colstring = $this->stringfromcolindex($colnumber);
                     if ( ! isset($val['indexchecks'][$colname]))
                     {
-
+                        $sheet->setCellValue($colstring.$startRow, '見取得');
                     }
                     else
                     {

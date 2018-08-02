@@ -41,6 +41,21 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                         <div class="text-center mt-5">
                             <?php echo $pagination; ?>
                             <p><?php echo $pages; ?>ページ中<?php echo $cur_page; ?>ページを表示</p>
+                            <?php echo form_open(uri_string(), array('class'=>'form-inline','name'=>'limit_form')); ?>
+                            <div class="form-group">
+                                <div class="input-group mb-3">
+                                    <select class="custom-select" id="limit" name="limit" onchange="limitformsubmit();">
+                                        <option value="10" <?php echo (isset($this->session->limit) && $this->session->limit == 10) ? 'selected' : ''; ?>>10</option>
+                                        <option value="<?php echo PAGEMAX; ?>" <?php echo ( ! isset($this->session->limit) or $this->session->limit == PAGEMAX) ? 'selected' : ''; ?>><?php echo PAGEMAX; ?></option>
+                                        <option value="100" <?php echo (isset($this->session->limit) && $this->session->limit == 100) ? 'selected' : ''; ?>>100</option>
+                                        <option value="200" <?php echo (isset($this->session->limit) && $this->session->limit == 300) ? 'selected' : ''; ?>>300</option>
+                                    </select>
+                                    <div class="input-group-append">
+                                        <label class="input-group-text" for="inputGroupSelect02">件表示</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php echo form_close(); ?>
                         </div>
                         <table class="table table-striped">
                             <thead>
@@ -103,7 +118,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                         <td><?php echo $report['cache_datetime']; ?></td>
                                         <?php foreach ($reports['cols'] as $col) : ?>
                                             <?php if ( ! isset($report['indexchecks'][$col])) : ?>
-                                                <td class="text-right">&nbsp;</td>
+                                                <td class="text-right"><?php echo '未取得'; ?></td>
                                             <?php else : ?>
                                                 <td class="text-right"><?php echo $report['indexchecks'][$col]; ?></td>
                                             <?php endif; ?>
@@ -132,3 +147,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     <div class="row" id="footer">
 
     </div>
+<script type="text/javascript">
+
+    function limitformsubmit() {
+        document.limit_form.submit();
+    }
+
+</script>
