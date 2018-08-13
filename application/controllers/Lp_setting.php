@@ -40,7 +40,7 @@ class Lp_setting extends CI_Controller {
         $wheredata[] = array('kind' => 'order_by', 'field_name' => 'sites.name', 'value' => 'ASC');
         $sites = $this->sites_model->load($wheredata);
         $this->data['sites'] = $sites;
-        $this->data['site_menues'] = $this->menues_model->sitemenues($sites, $this->session->site_id);
+        $this->data['site_menues'] = $this->menues_model->sitemenues($sites, $this->session->site_id,'lp_setting/site/%s');
 
         // TODO: メニュー
         $menues = $this->menues_model->load($this->session->users['status'], 'lowpages', 'lp_setting');
@@ -52,6 +52,11 @@ class Lp_setting extends CI_Controller {
 	{
 	    $this->data['title'] = '設定';
 
+	    if ( ! empty($this->session->site_id) && $this->session->site_id > 0)
+        {
+            redirect('lp_setting/site/'.$this->session->site_id);
+        }
+
 	    // ページを表示
         $this->load->view('_header', $this->data);
         $this->load->view('lp_setting', $this->data);
@@ -60,6 +65,8 @@ class Lp_setting extends CI_Controller {
 
 	public function site($site_id = NULL)
     {
+        // セッションに現在見ているサイトIDを登録
+        $this->session->site_id = $site_id;
 
         $this->data['site_id'] = $site_id;
 

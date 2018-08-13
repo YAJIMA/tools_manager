@@ -14,6 +14,13 @@
 // 1ページに表示する行数
 $page_max = 50;
 
+// ページングの選択項目（0は未使用）
+$page_count_1 = 50;
+$page_count_2 = 100;
+$page_count_3 = 300;
+$page_count_4 = 0;
+$page_count_5 = 0;
+
 // インデックスチェック履歴の保存数（月）
 $indexmonth = 12;
 
@@ -58,6 +65,11 @@ $db_collation = 'utf8_general_ci';
  */
 
 defined('PAGEMAX') OR define('PAGEMAX', $page_max);
+defined('PAGE_1') OR define('PAGE_1', $page_count_1);
+defined('PAGE_2') OR define('PAGE_2', $page_count_2);
+defined('PAGE_3') OR define('PAGE_3', $page_count_3);
+defined('PAGE_4') OR define('PAGE_4', $page_count_4);
+defined('PAGE_5') OR define('PAGE_5', $page_count_5);
 defined('INDEXMONTH') OR define('INDEXMONTH', $indexmonth);
 defined('GOOGLECACHEDAYS0') OR define('GOOGLECACHEDAYS0', $google_cache_days0);
 defined('GOOGLECACHEDAYS1') OR define('GOOGLECACHEDAYS1', $google_cache_days1);

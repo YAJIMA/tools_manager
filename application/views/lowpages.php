@@ -15,8 +15,18 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         </div>
         <div class="col-md-6">
             <h2>低評価ページ</h2>
+            <?php if (isset($this->session->site_id) && $this->session->site_id > 0) : ?>
+                <?php echo $siteinfo['name']; ?>
+            <?php else : ?>
+                <div class="list-group">
+                    <?php foreach ($site_menues['site_item'] as $site) : ?>
+                        <a href="<?php echo $site['href']; ?>" class="list-group-item <?php if ($site['active'] == "active") : ?>active<?php endif; ?>" ><?php echo $site['text']; ?></a>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
         </div>
         <div class="col-md-4">
+            <!--
             <h2>更新履歴</h2>
             <div class="list-group">
                 <div href="#" class="list-group-item flex-column align-items-start">
@@ -44,6 +54,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                     <small class="text-muted">Donec id elit non mi porta.</small>
                 </div>
             </div>
+            -->
         </div>
     </div>
     <div class="row" id="footer">

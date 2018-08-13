@@ -14,6 +14,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             </nav>
         </div>
         <div class="col-md-5">
+            <?php if (empty($this->session->site_id)) : ?>
             <h2>サイトを選択</h2>
             <!-- 設定フォーム TODO: サイト別の仕組みを実装 -->
             <div class="list-group">
@@ -23,10 +24,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                     </a>
                 <?php endforeach; ?>
             </div>
-        </div>
-        <div class="col-md-5">
-            <!-- TODO: サイト選択されてからフォーム表示 -->
-            <?php if ( ! empty($site_id)) : ?>
+
+            <?php else : ?>
             <h2><?php echo $site_data['name']; ?></h2>
             <?php echo form_open('lp_setting/update', array('class' => 'form'), array('back' => 'lp_setting/site/'.$site_data['id'], 'site_id' => $site_data['id'])); ?>
             <div id="anti_pattern">
@@ -108,7 +107,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 </div>
             </div>
             <div class="form-group">
-                <a href="#" onclick="javascript:addpattern();">行を追加</a>
+                <a href="#" onclick="javascript:addpattern();">[+] 行を追加</a>
             </div>
 
                 <!-- インデックスチェックを保存する月数 -->
@@ -148,14 +147,44 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                     <img src="<?php echo base_url('images/priority_setting.png'); ?>" class="float-right img-thumbnail" alt="デフォルト設定">
                                     <dl>
                                         <dt>優先度：高</dt>
-                                        <dd>Googleキャッシュ日からの<span class="text-danger">40日</span>経過<br>
-                                            <span class="text-muted">So-netインデックスチェックは使用しない</span></dd>
+                                        <dd>
+                                            <?php if (GOOGLECACHEDAYSCHECK0 == "on") : ?>
+                                                Googleキャッシュ日からの<span class="text-danger"><?php echo GOOGLECACHEDAYS0; ?>日</span>経過<br>
+                                            <?php else : ?>
+                                                <span class="text-muted">Googleキャッシュ日は使用しない</span><br>
+                                            <?php endif; ?>
+                                            <?php if (INDEXCHECKCHECK0 == "on") : ?>
+                                                So-netインデックスチェックが<span class="text-danger"><?php echo INDEXCHECK0; ?>ヶ月</span>連続なし
+                                            <?php else : ?>
+                                                <span class="text-muted">So-netインデックスチェックは使用しない</span>
+                                            <?php endif; ?>
+                                        </dd>
                                         <dt>優先度：中</dt>
-                                        <dd><span class="text-muted">Googleキャッシュ日は使用しない</span><br>
-                                            So-netインデックスチェックが<span class="text-danger">2ヶ月</span>連続なし</dd>
+                                        <dd>
+                                            <?php if (GOOGLECACHEDAYSCHECK1 == "on") : ?>
+                                                Googleキャッシュ日からの<span class="text-danger"><?php echo GOOGLECACHEDAYS1; ?>日</span>経過<br>
+                                            <?php else : ?>
+                                                <span class="text-muted">Googleキャッシュ日は使用しない</span><br>
+                                            <?php endif; ?>
+                                            <?php if (INDEXCHECKCHECK1 == "on") : ?>
+                                                So-netインデックスチェックが<span class="text-danger"><?php echo INDEXCHECK1; ?>ヶ月</span>連続なし
+                                            <?php else : ?>
+                                                <span class="text-muted">So-netインデックスチェックは使用しない</span>
+                                            <?php endif; ?>
+                                        </dd>
                                         <dt>優先度：低</dt>
-                                        <dd><span class="text-muted">Googleキャッシュ日は使用しない</span><br>
-                                            So-netインデックスチェックが<span class="text-danger">1ヶ月</span>なし</dd>
+                                        <dd>
+                                            <?php if (GOOGLECACHEDAYSCHECK2 == "on") : ?>
+                                                Googleキャッシュ日からの<span class="text-danger"><?php echo GOOGLECACHEDAYS2; ?>日</span>経過<br>
+                                            <?php else : ?>
+                                                <span class="text-muted">Googleキャッシュ日は使用しない</span><br>
+                                            <?php endif; ?>
+                                            <?php if (INDEXCHECKCHECK2 == "on") : ?>
+                                                So-netインデックスチェックが<span class="text-danger"><?php echo INDEXCHECK2; ?>ヶ月</span>連続なし
+                                            <?php else : ?>
+                                                <span class="text-muted">So-netインデックスチェックは使用しない</span>
+                                            <?php endif; ?>
+                                        </dd>
                                     </dl>
                                 </div>
                                 <div class="modal-footer">
@@ -262,7 +291,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                     d.innerHTML += addhtml;
                 }
             </script>
-            <?php endif; ?>
+        </div>
+        <?php endif; ?>
+        <div class="col-md-5">
+            &nbsp;
         </div>
     </div>
     <div class="row" id="footer">

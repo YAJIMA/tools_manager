@@ -399,6 +399,7 @@ class Lowpages_model extends CI_Model
         return $rowdata;
     }
 
+    // データ登録
     public function insert_data($rowdata = NULL, $site_id = 0)
     {
         if (empty($rowdata))
@@ -544,6 +545,11 @@ class Lowpages_model extends CI_Model
         }
         unset($row);
 
+        // noindex 削除処理
+        $this->db->like('robots', 'noindex');
+        $this->db->or_like('robots', 'nofollow');
+        $this->db->delete('lowpages');
+
         // トランザクション
         if ($this->db->trans_status() === FALSE)
         {
@@ -556,6 +562,38 @@ class Lowpages_model extends CI_Model
             return TRUE;
         }
 
+    }
+
+    // データ削除
+    public function delete_data($page_ids = NULL)
+    {
+        if ($page_ids == NULL)
+        {
+            return FALSE;
+        }
+
+        // トランザクションのスタート
+        $this->db->trans_begin();
+
+        if ( ! is_array($page_ids))
+        {
+            $page_ids[] = $page_ids;
+        }
+
+        $this->db->where_in('id',$page_ids);
+        $this->db->delete('lowpages');
+
+        // トランザクション
+        if ($this->db->trans_status() === FALSE)
+        {
+            $this->db->trans_rollback();
+            return FALSE;
+        }
+        else
+        {
+            $this->db->trans_commit();
+            return TRUE;
+        }
     }
 
     public function cache_update($rowdata = NULL)

@@ -49,10 +49,28 @@ class Lowpages extends CI_Controller {
 	{
 	    $this->data['title'] = '低評価ページ';
 
+	    if (isset($this->session->site_id) && $this->session->site_id > 0)
+        {
+            // サイト情報
+            $data = array();
+            $data[] = array('kind' => 'where', 'field_name' => 'sites.id', 'value' => $this->session->site_id);
+            $site_info = $this->sites_model->load($data);
+            $this->data['siteinfo'] = $site_info[0];
+        }
+
 	    // ページを表示
         $this->load->view('_header', $this->data);
         $this->load->view('lowpages', $this->data);
         $this->load->view('_footer', $this->data);
 	}
 
+	public  function site($site_id = NULL)
+    {
+        $this->data['title'] = '低評価ページ';
+
+        // セッションに現在見ているサイトIDを登録
+        $this->session->site_id = $site_id;
+
+        redirect('lowpages');
+    }
 }

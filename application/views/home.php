@@ -15,31 +15,28 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         </div>
         <div class="col-md-6">
             <h2>ダッシュボード</h2>
-            <p>管理トップページです。利用したいツールを以下のリンクから選んで下さい。</p>
+            <?php if (isset($this->session->site_id) && $this->session->site_id > 0) : ?>
+            <h3>現在選択中のサイト</h3>
+                <p>選択サイトの変更は、上のメニューバーで変更して下さい。</p>
+                <p class="text-success"><?php echo $siteinfo['name']; ?> (<?php echo $siteinfo['url']; ?>)</p>
+            <?php else : ?>
+            <h3>サイトを選択して下さい</h3>
+                <ul>
+                <?php foreach ($site_menues['site_item'] as $site) : ?>
+                    <li><a href="<?php echo $site['href']; ?>"><?php echo $site['text']; ?> (<?php echo $site['site_url']; ?>)</a></li>
+                <?php endforeach; ?>
+                </ul>
+            <?php endif; ?>
+            <?php if (isset($this->session->site_id) && $this->session->site_id > 0) : ?>
+            <h3>ツール</h3>
+            <p>利用したいツールを以下のリンクから選んで下さい。</p>
             <ul>
                 <li><a href="<?php echo base_url('lowpages'); ?>">低品質ページツール</a></li>
             </ul>
+            <?php endif; ?>
         </div>
         <div class="col-md-4">
-            <h2>ヒント</h2>
-            <div class="list-group">
-                <div href="#" class="list-group-item flex-column align-items-start">
-                    <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">グループ管理</h5>
-                        <small class="text-muted">2018/07/05</small>
-                    </div>
-                    <p class="mb-1">グループ内に、ユーザー、およびサイトを所属させます。グループをクライアント、ユーザーを担当者、サイトをサイトで管理することを基準に設計されています。</p>
-                    <small class="text-muted">&nbsp;</small>
-                </div>
-                <div href="#" class="list-group-item flex-column align-items-start">
-                    <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">低品質ページツール</h5>
-                        <small class="text-muted">2018/07/05</small>
-                    </div>
-                    <p class="mb-1">低品質ページツールは、Google キャッシュ、および So-net インデックス数を元にページの品質を評価します。</p>
-                    <small class="text-muted">&nbsp;</small>
-                </div>
-            </div>
+            &nbsp;
         </div>
     </div>
     <div class="row" id="footer">

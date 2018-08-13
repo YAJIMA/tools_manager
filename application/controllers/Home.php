@@ -31,23 +31,29 @@ class Home extends CI_Controller {
         {
             $userdata = $this->users_model->load_one($this->session->userdata("username"));
 
-            // 配下のサイトを取得
-            $this->data['sites'] = array();
-            $querydata = array();
-            $querydata[] = array('kind'=>'order_by', 'field_name'=>'sites.id', 'value'=>'desc');
-            if ($userdata['group_id'] == '0')
-            {
-                $querydata[] = array('kind'=>'where', 'field_name'=>'sites.id >', 'value'=>'0');
-            }
-            else
-            {
-                $querydata[] = array('kind'=>'where', 'field_name'=>'sites.group_id', 'value'=>$userdata['group_id']);
-            }
-            $this->data['sites'] = $this->sites_model->load($querydata);
-
             // ユーザーデータ
             $this->session->set_userdata(array("users" => $userdata));
 
+            // サイト一覧
+            $wheredata = array();
+            if ($this->session->users['group_id'] > 0) {
+                $wheredata[] = array('kind' => 'where', 'field_name' => 'group_id', 'value' => $this->session->users['group_id']);
+            }
+            $wheredata[] = array('kind' => 'order_by', 'field_name' => 'sites.group_id', 'value' => 'ASC');
+            $wheredata[] = array('kind' => 'order_by', 'field_name' => 'sites.name', 'value' => 'ASC');
+            $sites = $this->sites_model->load($wheredata);
+            $this->data['sites'] = $sites;
+
+            $this->data['site_menues'] = $this->menues_model->sitemenues($sites, $this->session->site_id, 'home/site/%s');
+        }
+
+        if (isset($this->session->site_id) && $this->session->site_id > 0)
+        {
+            // サイト情報
+            $data = array();
+            $data[] = array('kind' => 'where', 'field_name' => 'sites.id', 'value' => $this->session->site_id);
+            $site_info = $this->sites_model->load($data);
+            $this->data['siteinfo'] = $site_info[0];
         }
 
         // メニュー
@@ -65,4 +71,13 @@ class Home extends CI_Controller {
         $this->load->view('_footer', $this->data);
 	}
 
+    public  function site($site_id = NULL)
+    {
+        $this->data['title'] = '低評価ページ';
+
+        // セッションに現在見ているサイトIDを登録
+        $this->session->site_id = $site_id;
+
+        redirect('home');
+    }
 }

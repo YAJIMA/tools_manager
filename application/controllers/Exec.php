@@ -10,6 +10,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Exec extends CI_Controller {
 
     public $api_dir = 'http://tool.kunugi-inc.com/apis/';
+    public $output_dir = BASEPATH . '../outputs/';
 
     public function sitecheck($limit = 20, $usleep = 10000000, $yyyymm = NULL)
     {
@@ -129,6 +130,40 @@ class Exec extends CI_Controller {
         {
             $response .= '<br><a href="'.current_url().'">もう一度実行</a><br>終了する場合は、タブ（ウィンドウ）を閉じて下さい。';
             echo $response;
+        }
+    }
+
+    public function deletefiles()
+    {
+        $time_start = microtime(true);
+
+        if (is_cli())
+        {
+            echo 'START '.date("Y-n-j H:i:s", time()).PHP_EOL;
+        }
+
+        $this->load->helper('file');
+
+        /**
+         * パラメータ:
+         * $path (string) – ディレクトリパス
+         * $del_dir (bool) – ディレクトリも合わせて削除するかどうか
+         * $htdocs (bool) – .htaccess やインデックスファイルの削除をスキップするかどうか
+         */
+        $exec = delete_files($this->output_dir, FALSE, TRUE);
+
+        if ($exec)
+        {
+            echo 'DELETED !.'.date("Y-n-j H:i:s", time()).PHP_EOL;
+        }
+        else
+        {
+            echo 'FAILURE !.'.date("Y-n-j H:i:s", time()).PHP_EOL;
+        }
+
+        if (is_cli())
+        {
+            echo 'END '.date("Y-n-j H:i:s", time()).PHP_EOL;
         }
     }
 }

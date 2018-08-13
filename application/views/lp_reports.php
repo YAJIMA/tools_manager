@@ -26,11 +26,19 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                     <?php if (isset($directories)) : ?>
                         <h3>階層で絞り込み</h3>
                         <p>階層（ディレクトリ）でレポートを絞り込み表示できます。<br>階層を選んでください。</p>
-                        <div class="list-group">
-                            <a href="<?php echo base_url('lp_reports/site/'.$this->session->site_id.'/__'); ?>" class="list-group-item">絞り込みしない（全て表示）</a>
+
+                        <?php echo form_open('',array('class'=>'form-inline','name'=>'directory_form')); ?>
+                        <select name="sort" class="form-control" onchange="directorysort();">
+                            <option value="<?php echo base_url('lp_reports/site/'.$this->session->site_id.'/__'); ?>">絞り込みしない（全て表示）</option>
                             <?php foreach ($directories as $key => $val) : ?>
-                                <a href="<?php echo base_url('lp_reports/site/'.$this->session->site_id.'/'.$key); ?>" class="list-group-item"><?php echo $val['path']; ?></a>
+                            <?php if ( ! empty($val['path'])) : ?>
+                                <option value="<?php echo base_url('lp_reports/site/'.$this->session->site_id.'/'.$key); ?>" <?php echo ($val['current'] == 1) ? 'selected' : ''; ?>><?php echo $val['path']; ?></option>
+                            <?php endif; ?>
                             <?php endforeach; ?>
+                        </select>
+                        <?php echo form_close(); ?>
+
+                        <div class="list-group">
                         </div>
                     <?php endif; ?>
                 </div>
@@ -45,10 +53,21 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <select class="custom-select" id="limit" name="limit" onchange="limitformsubmit();">
-                                        <option value="10" <?php echo (isset($this->session->limit) && $this->session->limit == 10) ? 'selected' : ''; ?>>10</option>
-                                        <option value="<?php echo PAGEMAX; ?>" <?php echo ( ! isset($this->session->limit) or $this->session->limit == PAGEMAX) ? 'selected' : ''; ?>><?php echo PAGEMAX; ?></option>
-                                        <option value="100" <?php echo (isset($this->session->limit) && $this->session->limit == 100) ? 'selected' : ''; ?>>100</option>
-                                        <option value="200" <?php echo (isset($this->session->limit) && $this->session->limit == 300) ? 'selected' : ''; ?>>300</option>
+                                        <?php if (PAGE_1 > 0) : ?>
+                                            <option value="<?php echo PAGE_1; ?>" <?php echo (isset($this->session->limit) && $this->session->limit == PAGE_1) ? 'selected' : ''; ?>><?php echo PAGE_1; ?></option>
+                                        <?php endif; ?>
+                                        <?php if (PAGE_2 > 0) : ?>
+                                            <option value="<?php echo PAGE_2; ?>" <?php echo (isset($this->session->limit) && $this->session->limit == PAGE_2) ? 'selected' : ''; ?>><?php echo PAGE_2; ?></option>
+                                        <?php endif; ?>
+                                        <?php if (PAGE_3 > 0) : ?>
+                                            <option value="<?php echo PAGE_3; ?>" <?php echo (isset($this->session->limit) && $this->session->limit == PAGE_3) ? 'selected' : ''; ?>><?php echo PAGE_3; ?></option>
+                                        <?php endif; ?>
+                                        <?php if (PAGE_4 > 0) : ?>
+                                            <option value="<?php echo PAGE_4; ?>" <?php echo (isset($this->session->limit) && $this->session->limit == PAGE_4) ? 'selected' : ''; ?>><?php echo PAGE_4; ?></option>
+                                        <?php endif; ?>
+                                        <?php if (PAGE_5 > 0) : ?>
+                                            <option value="<?php echo PAGE_5; ?>" <?php echo (isset($this->session->limit) && $this->session->limit == PAGE_5) ? 'selected' : ''; ?>><?php echo PAGE_5; ?></option>
+                                        <?php endif; ?>
                                     </select>
                                     <div class="input-group-append">
                                         <label class="input-group-text" for="inputGroupSelect02">件表示</label>
@@ -57,9 +76,16 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                             </div>
                             <?php echo form_close(); ?>
                         </div>
+
+                        <?php echo form_open('lp_reports/delete', array('class'=>'form','name'=>'delete_form'), array('back_uri'=>uri_string())); ?>
                         <table class="table table-striped">
                             <thead>
                             <tr>
+                                <?php if ($this->session->users['status'] == '9' or $this->session->users['status'] == '1') : ?>
+                                <th>
+                                    <input type="checkbox" name="allcheck" id="allcheck" value="on" onchange="ToggleChecks();">
+                                </th>
+                                <?php endif; ?>
                                 <th>施策</th>
                                 <th>
                                     URL
@@ -106,6 +132,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                             <?php foreach ($reports as $key => $report) : ?>
                                 <?php if (is_numeric($key)) : ?>
                                     <tr>
+                                        <?php if ($this->session->users['status'] == '9' or $this->session->users['status'] == '1') : ?>
+                                            <td>
+                                                <input type="checkbox" name="page_ids[]" id="page_ids_<?php echo $key; ?>" value="<?php echo $report['id']; ?>" onclick="DisChecked();">
+                                            </td>
+                                        <?php endif; ?>
                                         <td><span class="<?php echo $report['operation']; ?>"><?php echo $operations[$report['operation']]; ?></span></td>
                                         <td><?php echo $report['path']; ?></td>
                                         <td>
@@ -128,6 +159,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                             <?php endforeach; ?>
                             </tbody>
                         </table>
+                    <?php if ($this->session->users['status'] == '9' or $this->session->users['status'] == '1') : ?>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-danger btn-lg" onclick="return confirm('チェックされたページを削除します。\nこの作業は取り消しできません。\nよろしいですか？');return false;">チェックしたページを削除</button>
+                        </div>
+                    <?php endif; ?>
+                        <?php echo form_close(); ?>
                         <div class="text-center">
                             <?php echo $pagination; ?>
                             <p><?php echo $pages; ?>ページ中<?php echo $cur_page; ?>ページを表示</p>
@@ -153,4 +190,57 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         document.limit_form.submit();
     }
 
+    function directorysort() {
+        var browser = document.directory_form.sort.value;
+        location.href = browser
+    }
+
+    // 全部チェックする・しない
+    function ToggleChecks() {
+
+        // チェックボックス要素をすべて取得する
+        var boxes = document.getElementsByName("page_ids[]");
+
+        // チェックボックスの個数を取得する
+        var cnt = boxes.length;
+        //console.log('cnt '+cnt+'.');
+
+        if (document.getElementById("allcheck").checked === true)
+        {
+            //console.log('ONにする');
+            for(var i=0; i<cnt; i++) {
+                boxes.item(i).checked = true;
+            }
+        }
+        else
+        {
+            //console.log('OFFにする');
+            for(var i=0; i<cnt; i++) {
+                boxes.item(i).checked = false;
+            }
+        }
+    }
+
+    // 一つでもチェックを外すと「全て選択」のチェック外れる
+    function　DisChecked(){
+
+        // チェックボックス要素をすべて取得する
+        var boxes = document.getElementsByName("page_ids[]");
+
+        // チェックボックスの個数を取得する
+        var cnt = boxes.length;
+
+        var checksCount = 0;
+
+        for (var i=0; i<cnt; i++){
+            if(boxes.item(i).checked === false){
+                document.getElementById("allcheck").checked = false;
+            }else{
+                checksCount += 1;
+                if(checksCount == cnt){
+                    document.getElementById("allcheck").checked = true;
+                }
+            }
+        }
+    }
 </script>

@@ -219,11 +219,17 @@ class Lp_reports extends CI_Controller {
 
         foreach ($directories_data as $val)
         {
+            $current = FALSE;
             $path = $val['breadcrumb1'];
             $path .= ( ! empty($val['breadcrumb2'])) ? '&nbsp;&gt;&nbsp;'.$val['breadcrumb2'] : '';
             $path .= ( ! empty($val['breadcrumb3'])) ? '&nbsp;&gt;&nbsp;'.$val['breadcrumb3'] : '';
             $path .= ( ! empty($val['breadcrumb4'])) ? '&nbsp;&gt;&nbsp;'.$val['breadcrumb4'] : '';
             $path .= ( ! empty($val['breadcrumb5'])) ? '&nbsp;&gt;&nbsp;'.$val['breadcrumb5'] : '';
+
+            if ($dir == $val['breadcrumb'])
+            {
+                $current = TRUE;
+            }
 
             $directories[$val['breadcrumb']] = array(
                 'breadcrumb1' => $val['breadcrumb1'],
@@ -231,10 +237,12 @@ class Lp_reports extends CI_Controller {
                 'breadcrumb3' => $val['breadcrumb3'],
                 'breadcrumb4' => $val['breadcrumb4'],
                 'breadcrumb5' => $val['breadcrumb5'],
-                'path' => $path
+                'path' => $path,
+                'current' => $current,
             );
         }
 
+        asort($directories);
         $this->data['directories'] = $directories;
 
         // エクセルファイルを作成
@@ -262,6 +270,18 @@ class Lp_reports extends CI_Controller {
         $this->load->view('_header', $this->data);
         $this->load->view('lp_reports', $this->data);
         $this->load->view('_footer', $this->data);
+    }
+
+    public function delete()
+    {
+        // TODO: ページを削除（複数のページを削除できる）
+        $page_ids = $this->input->post('page_ids');
+        $this->lowpages_model->delete_data($page_ids);
+
+        // TODO: 元のページへリダイレクト
+        $back_uri = $this->input->post('back_uri');
+        redirect($back_uri);
+
     }
 
     public function file($filename = NULL)

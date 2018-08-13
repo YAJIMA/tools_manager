@@ -85,7 +85,8 @@ class Menues_model extends CI_Model
                         break;
                 }
 
-                // メニューのテンプレート
+                // ツールへのリンク
+                // 低品質ページ
                 $link_items = array('href' => '', 'text'=>'', 'active' => '');
                 // メニューの設定
                 $link_items['href'] = base_url('lowpages');
@@ -125,56 +126,60 @@ class Menues_model extends CI_Model
                 }
                 $this->menues['link_item'][] = $link_items;
 
-                // メニューのテンプレート
-                $link_items = array('href' => '', 'text'=>'', 'active' => '');
-                // メニューの設定
-                $link_items['href'] = base_url('lp_reports');
-                $link_items['text'] = 'レポート';
-                if ($current_page == 'lp_reports')
+                if ($this->session->site_id > 0)
                 {
-                    $link_items['active'] = 'active';
-                }
-                $this->menues['link_item'][] = $link_items;
-
-                if ($user_status > 5)
-                {
-                    // CSVファイルアップロード
                     // メニューのテンプレート
                     $link_items = array('href' => '', 'text'=>'', 'active' => '');
                     // メニューの設定
-                    $link_items['href'] = base_url('lp_csv');
-                    $link_items['text'] = 'CSVファイル';
-                    if ($current_page == 'lp_csv')
+                    $link_items['href'] = base_url('lp_reports');
+                    $link_items['text'] = 'レポート';
+                    if ($current_page == 'lp_reports')
                     {
                         $link_items['active'] = 'active';
                     }
                     $this->menues['link_item'][] = $link_items;
 
-                    // インデックスチェック
-                    // メニューのテンプレート
-                    $link_items = array('href' => '', 'text'=>'', 'active' => '', 'target' => '');
-                    // メニューの設定
-                    $link_items['href'] = base_url('lp_indexcheck');
-                    $link_items['text'] = 'インデックスチェック';
-                    if ($current_page == 'lp_indexcheck')
+                    if ($user_status == 9)
                     {
-                        $link_items['active'] = 'active';
-                    }
-                    $this->menues['link_item'][] = $link_items;
+                        // CSVファイルアップロード
+                        // メニューのテンプレート
+                        $link_items = array('href' => '', 'text'=>'', 'active' => '');
+                        // メニューの設定
+                        $link_items['href'] = base_url('lp_csv');
+                        $link_items['text'] = 'CSVファイル';
+                        if ($current_page == 'lp_csv')
+                        {
+                            $link_items['active'] = 'active';
+                        }
+                        $this->menues['link_item'][] = $link_items;
 
-                    // 設定
-                    // メニューのテンプレート
-                    $link_items = array('href' => '', 'text'=>'', 'active' => '');
-                    // メニューの設定
-                    $link_items['href'] = base_url('lp_setting');
-                    $link_items['text'] = '設定';
-                    if ($current_page == 'lp_setting')
-                    {
-                        $link_items['active'] = 'active';
+                        /*
+                        // インデックスチェック
+                        // メニューのテンプレート
+                        $link_items = array('href' => '', 'text'=>'', 'active' => '', 'target' => '');
+                        // メニューの設定
+                        $link_items['href'] = base_url('lp_indexcheck');
+                        $link_items['text'] = 'インデックスチェック';
+                        if ($current_page == 'lp_indexcheck')
+                        {
+                            $link_items['active'] = 'active';
+                        }
+                        $this->menues['link_item'][] = $link_items;
+                        */
+
+                        // 設定
+                        // メニューのテンプレート
+                        $link_items = array('href' => '', 'text'=>'', 'active' => '');
+                        // メニューの設定
+                        $link_items['href'] = base_url('lp_setting');
+                        $link_items['text'] = '設定';
+                        if ($current_page == 'lp_setting')
+                        {
+                            $link_items['active'] = 'active';
+                        }
+                        $this->menues['link_item'][] = $link_items;
                     }
-                    $this->menues['link_item'][] = $link_items;
                 }
-
                 break;
         }
 
@@ -182,7 +187,7 @@ class Menues_model extends CI_Model
     }
 
     // TODO: サイトメニュー
-    public function sitemenues($sites = NULL, $current_id = 0)
+    public function sitemenues($sites = NULL, $current_id = 0, $uri_format = 'lowpages/site/%s')
     {
         $this->menues['site_item'] = array();
 
@@ -191,9 +196,10 @@ class Menues_model extends CI_Model
             // メニューのテンプレート
             $site_items = array('href' => '', 'text'=>'', 'active' => '');
             // メニューの設定
-            $uri = 'lp_reports/site/'.$site['id'];
+            $uri = sprintf($uri_format, $site['id']);
             $site_items['href'] = base_url($uri);
             $site_items['text'] = $site['name'];
+            $site_items['site_url'] = $site['url'];
             if ($current_id == $site['id'])
             {
                 $site_items['active'] = 'active';

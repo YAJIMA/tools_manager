@@ -13,7 +13,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             <?php endif; ?>
             </nav>
         </div>
-        <div class="col-md-10">
+        <div class="col-md-5">
             <!-- 送信完了メッセージ -->
             <?php if (isset($resultdata)) : ?>
                 <div class="alert alert-success" role="alert">データを登録しました。</div>
@@ -24,17 +24,36 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             <?php if (isset($disp) && $disp == "form") : ?>
                 <h2>Screaming Frog SEO Spider</h2>
             <?php echo validation_errors(); ?>
-                <?php echo form_open_multipart("lp_csv/upload", array("role" => "form", "class" => "form"), array("uri_string" => uri_string())); ?>
+                <?php echo form_open_multipart("lp_csv/upload", array("role" => "form", "class" => "form"), array("uri_string" => uri_string(), "site_id" =>$this->session->site_id)); ?>
                 <div class="form-group">
-                    <label for="site_id">サイト</label>
-                    <select name="site_id" id="site_id" class="form-control">
-                        <?php foreach ($sites as $site) : ?>
-                        <option value="<?php echo $site['id']; ?>"><?php echo $site['group_name']; ?> - <?php echo $site['name']; ?> ( <?php echo $site['url']; ?> )</option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="filename">ファイル</label>
+                    <label for="filename">
+                        ファイル
+                        <a href="#" class="badge badge-light" data-toggle="modal" data-target="#csvfile_hint">
+                            ？
+                        </a>
+                    </label>
+                    <!-- Modal -->
+                    <div class="modal fade" id="csvfile_hint" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-lg" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">Screaming Frog SEO Spider ファイル</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    Screaming Frog SEO Spider ファイルをアップロードして下さい。<br>
+                                    アップロードした次のページで、パンくずリストに使用するカラム（列）の指定があります。<br>
+                                    パンくずリストの指定は、アップロード後に変更はできませんので間違いがないように気をつけて下さい。<br>
+                                    <img src="<?php echo base_url('images/internal_all_csv.png'); ?>" class="float-right img-thumbnail" alt="Screaming Frog SEO Spider ファイル">
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <input type="file" name="filename" id="filename" value="" class="form-control" required onchange="filetypecheck();">
                 </div>
                 <div class="form-group">
@@ -91,7 +110,32 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 <h2>Google キャッシュ</h2>
                 <?php echo form_open_multipart("lp_csv/uploadcache", array("role" => "form", "class" => "form"), array("uri_string" => uri_string(), "filetype" => "csv")); ?>
                 <div class="form-group">
-                    <label for="filename2">ファイル</label>
+                    <label for="filename2">
+                        ファイル
+                        <a href="#" class="badge badge-light" data-toggle="modal" data-target="#gfile_hint">
+                            ？
+                        </a>
+                    </label>
+                    <!-- Modal -->
+                    <div class="modal fade" id="gfile_hint" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-lg" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">Google キャッシュファイル</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    Google キャッシュファイルは、ページURLとキャッシュ日時を記録したファイルをアップロードして下さい。<br>
+                                    <img src="<?php echo base_url('images/google_cache_csv.png'); ?>" class="float-right img-thumbnail" alt="Google キャッシュファイル">
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <input type="file" name="filename" id="filename2" value="" class="form-control" required onchange="filetypecheck();">
                 </div>
                 <div class="form-group">
@@ -242,6 +286,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 <?php echo form_close(); ?>
             <?php endif; ?>
             <!-- //プレビュー Googleキャッシュ -->
+        </div>
+        <div class="col-md-5">
         </div>
     </div>
     <div class="row" id="footer">
