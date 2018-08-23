@@ -13,7 +13,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             <?php endif; ?>
             </nav>
         </div>
-        <div class="col-md-5">
+        <div class="col-md-10">
             <!-- 送信完了メッセージ -->
             <?php if (isset($resultdata)) : ?>
                 <div class="alert alert-success" role="alert">データを登録しました。</div>
@@ -170,7 +170,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                             </td>
                             <?php for ($i = 0; $i < 3; $i++) : ?>
                             <td class="text-muted" style="overflow: hidden; width: 20%;">
-                                <?php echo $previewdata[$i][$hl]; ?>
+                                <?php echo (isset($previewdata[$i][$hl])) ? $previewdata[$i][$hl] : '&nbsp;'; ?>
                             </td>
                             <?php endfor; ?>
                         </tr>
@@ -182,6 +182,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                     <button type="submit" class="btn btn-success">登録</button>
                 </div>
                 <?php echo form_close(); ?>
+            <!-- <?php print_r($previewdata); ?> -->
             <?php endif; ?>
             <!-- //登録カラム設定フォーム -->
 
@@ -286,8 +287,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 <?php echo form_close(); ?>
             <?php endif; ?>
             <!-- //プレビュー Googleキャッシュ -->
-        </div>
-        <div class="col-md-5">
         </div>
     </div>
     <div class="row" id="footer">

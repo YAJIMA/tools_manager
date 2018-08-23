@@ -30,6 +30,17 @@ class Lp_setting extends CI_Controller {
             redirect('login');
         }
 
+        // アクセス拒否
+        switch ($this->session->users['status'])
+        {
+            case '1':
+            case '7':
+                redirect('lowpages');
+                break;
+            default:
+                break;
+        }
+
         // サイト一覧
         $wheredata = array();
         if ($this->session->users['group_id'] > 0)

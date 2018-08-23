@@ -34,6 +34,17 @@ class Lp_csv extends CI_Controller
             redirect('login');
         }
 
+        // アクセス拒否
+        switch ($this->session->users['status'])
+        {
+            case '1':
+            case '7':
+                redirect('lowpages');
+                break;
+            default:
+                break;
+        }
+
         // サイト一覧
         $wheredata = array();
         if ($this->session->users['group_id'] > 0) {
@@ -134,7 +145,7 @@ class Lp_csv extends CI_Controller
             $patterns = $this->lowpages_model->setting_load($wheredata);
 
             // パターンマッチ
-            $rowdata = $this->lowpages_model->pattern_match($rowdata, $patterns);
+            $rowdata2 = $this->lowpages_model->pattern_match($rowdata, $patterns);
 
             // 必須パラメータ
             $params = array(
@@ -146,7 +157,7 @@ class Lp_csv extends CI_Controller
             $this->data['params'] = $params;
             $this->data['headline'] = $headline;
             $this->data['patterns'] = $patterns;
-            $this->data['previewdata'] = $rowdata;
+            $this->data['previewdata'] = $rowdata2;
         }
 
         // ページを表示

@@ -33,6 +33,17 @@ class Group extends CI_Controller
             redirect('login');
         }
 
+        // アクセス拒否
+        switch ($this->session->users['status'])
+        {
+            case '1':
+            case '7':
+                redirect('home');
+                break;
+            default:
+                break;
+        }
+
         // メニュー
         $menues = $this->menues_model->load($this->session->users['status'], 'home', 'group');
         $this->data['menues'] = $menues;

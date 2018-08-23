@@ -33,6 +33,16 @@ class User extends CI_Controller
             redirect('login');
         }
 
+        // アクセス拒否
+        switch ($this->session->users['status'])
+        {
+            case '1':
+                redirect('home');
+                break;
+            default:
+                break;
+        }
+
         // メニュー
         $menues = $this->menues_model->load($this->session->users['status'], 'home', 'user');
         $this->data['menues'] = $menues;

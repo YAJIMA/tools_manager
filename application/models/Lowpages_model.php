@@ -304,6 +304,8 @@ class Lowpages_model extends CI_Model
     // パターンマッチ
     public function pattern_match($rowdata = NULL, $patterns = NULL)
     {
+        $results = array();
+
         if (empty($rowdata))
         {
             return FALSE;
@@ -313,8 +315,10 @@ class Lowpages_model extends CI_Model
             return $rowdata;
         }
 
+
         foreach ($rowdata as $key => $value)
         {
+            $this_row = TRUE;
             $address = $value['Address'];
             foreach ($patterns as $pattern)
             {
@@ -328,6 +332,7 @@ class Lowpages_model extends CI_Model
                         if (strpos($address, $pat, 0) > 0)
                         {
                             unset($rowdata[$key]);
+                            $this_row = FALSE;
                         }
                     }
                     else
@@ -337,6 +342,7 @@ class Lowpages_model extends CI_Model
                         if (strpos($address, $pat, 0) !== FALSE)
                         {
                             unset($rowdata[$key]);
+                            $this_row = FALSE;
                         }
                     }
                 }
@@ -347,6 +353,7 @@ class Lowpages_model extends CI_Model
                     if (strpos($address, $pat, 0) === 0)
                     {
                         unset($rowdata[$key]);
+                        $this_row = FALSE;
                     }
                 }
                 else
@@ -356,14 +363,20 @@ class Lowpages_model extends CI_Model
                     if (strpos($address, $pat, 0) > 0)
                     {
                         unset($rowdata[$key]);
+                        $this_row = FALSE;
                     }
+                }
+
+                if ($this_row === TRUE)
+                {
+                    $results[] = $value;
                 }
             }
             unset($pattern);
         }
         unset($key, $value);
 
-        return $rowdata;
+        return $results;
     }
 
     // 選択データ
