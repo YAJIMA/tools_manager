@@ -70,9 +70,17 @@ class Excel_model extends CI_Model
         {
             $sheet->setCellValue('G1',substr($colarr[0],0,4).'年'.substr($colarr[0],4,2).'月');
         }
+        else
+        {
+            $sheet->setCellValue('G1','データ無し');
+        }
         if (isset($colarr[1]))
         {
             $sheet->setCellValue('L1',substr($colarr[1],0,4).'年'.substr($colarr[1],4,2).'月');
+        }
+        else
+        {
+            $sheet->setCellValue('L1','データ無し');
         }
 
         $sheet->getStyle('B1:P1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
@@ -80,23 +88,23 @@ class Excel_model extends CI_Model
         // ヘッダー（2行目）
         $sheet->setCellValue('A2','合計');
 
-
-        $styleSumHead = [
-            'font' => [
-                'color' => [
-                    'argb' => 'FF000000',
-                ],
-            ],
-            'fill' => [
+        $styleSumHead = array(
+            'font' => array(
+                'color' => array(
+                    'argb' => 'FF000000'
+                )
+            ),
+            'fill' => array(
                 'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                'startColor' => [
-                    'argb' => 'FFE5E5E5',
-                ],
-                'endColor' => [
-                    'argb' => 'FFE5E5E5',
-                ],
-            ],
-        ];
+                'startColor' => array(
+                    'argb' => 'FFE5E5E5'
+                ),
+                'endColor' => array(
+                    'argb' => 'FFE5E5E5'
+                )
+            )
+        );
+
         $sheet->getStyle('A2:P2')->applyFromArray($styleSumHead);
 
         // ヘッダー（3行目）
@@ -120,22 +128,23 @@ class Excel_model extends CI_Model
         $sheet->setCellValue('O3','低品質(優先度:中)');
         $sheet->setCellValue('P3','低品質(優先度:高)');
 
-        $styleBlackHead = [
-            'font' => [
-                'color' => [
-                    'argb' => 'FFFFFFFF',
-                ],
-            ],
-            'fill' => [
+        $styleBlackHead = array(
+            'font' => array(
+                'color' => array(
+                    'argb' => 'FFFFFFFF'
+                )
+            ),
+            'fill' => array(
                 'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                'startColor' => [
-                    'argb' => 'FF000000',
-                ],
-                'endColor' => [
-                    'argb' => 'FF000000',
-                ],
-            ],
-        ];
+                'startColor' => array(
+                    'argb' => 'FF000000'
+                ),
+                'endColor' => array(
+                    'argb' => 'FF000000'
+                )
+            )
+        );
+
         $sheet->getStyle('A3:P3')->applyFromArray($styleBlackHead);
 
         // データ書き込み
@@ -143,71 +152,46 @@ class Excel_model extends CI_Model
         // 4行目からデータスタート
         $row = 4;
 
-        if (isset($colarr[0], $colarr[1]))
+        // 直近月のデータ
+        if (isset($colarr[0]))
         {
-
-            // 直近月のデータ
-            $lastdata = $this->monthsum($data, $colarr[0]);
-
-            // その前月のデータ
-            $currentdata = current($data);
-            $lastlastdata = $this->monthsumload($currentdata['site_id'], $currentdata['id'], $currentdata['path'], $colarr[1]);
-
-            foreach ($lastdata as $path => $lastdatum)
-            {
-                $sheet->setCellValue('A'.$row,$path);
-
-                $sheet->setCellValue('B'.$row,'=SUM(C'.$row.':F'.$row.')');
-                $sheet->setCellValue('C'.$row,'=H'.$row.'-M'.$row);
-                $sheet->setCellValue('D'.$row,'=I'.$row.'-N'.$row);
-                $sheet->setCellValue('E'.$row,'=J'.$row.'-O'.$row);
-                $sheet->setCellValue('F'.$row,'=K'.$row.'-P'.$row);
-
-                $sheet->setCellValue('G'.$row,'=SUM(H'.$row.':K'.$row.')');
-                $sheet->setCellValue('H'.$row,$lastdatum['none']);
-                $sheet->setCellValue('I'.$row,$lastdatum['low']);
-                $sheet->setCellValue('J'.$row,$lastdatum['mid']);
-                $sheet->setCellValue('K'.$row,$lastdatum['high']);
-
-                $sheet->setCellValue('L'.$row,'=SUM(M'.$row.':P'.$row.')');
-                if (isset($lastlastdata[$path]['none']))
-                {
-                    $sheet->setCellValue('M'.$row,$lastlastdata[$path]['none']);
-                }
-                else
-                {
-                    $sheet->setCellValue('M'.$row,'0');
-                }
-                if (isset($lastlastdata[$path]['low']))
-                {
-                    $sheet->setCellValue('N'.$row,$lastlastdata[$path]['low']);
-                }
-                else
-                {
-                    $sheet->setCellValue('N'.$row,'0');
-                }
-                if (isset($lastlastdata[$path]['mid']))
-                {
-                    $sheet->setCellValue('O'.$row,$lastlastdata[$path]['mid']);
-                }
-                else
-                {
-                    $sheet->setCellValue('O'.$row,'0');
-                }
-                if (isset($lastlastdata[$path]['high']))
-                {
-                    $sheet->setCellValue('P'.$row,$lastlastdata[$path]['high']);
-                }
-                else
-                {
-                    $sheet->setCellValue('P'.$row,'0');
-                }
-
-                $row++;
-            }
-
-
+            $lastdata = $this->monthsum_bc($data, $colarr[0]);
         }
+
+        // その前月のデータ
+        $currentdata = current($data);
+        if (isset($colarr[1]))
+        {
+            $lastlastdata = $this->monthsumload($currentdata['site_id'], $currentdata['id'], $currentdata['path'], $colarr[1]);
+        }
+
+
+        foreach ($lastdata as $path => $lastdatum)
+        {
+            $sheet->setCellValue('A'.$row,$path);
+
+            $sheet->setCellValue('B'.$row,'=SUM(C'.$row.':F'.$row.')');
+            $sheet->setCellValue('C'.$row,'=H'.$row.'-M'.$row);
+            $sheet->setCellValue('D'.$row,'=I'.$row.'-N'.$row);
+            $sheet->setCellValue('E'.$row,'=J'.$row.'-O'.$row);
+            $sheet->setCellValue('F'.$row,'=K'.$row.'-P'.$row);
+
+            $sheet->setCellValue('G'.$row,'=SUM(H'.$row.':K'.$row.')');
+            $sheet->setCellValue('H'.$row,(isset($lastdatum['none'])) ? $lastdatum['none'] : '0');
+            $sheet->setCellValue('I'.$row,(isset($lastdatum['low'])) ? $lastdatum['low'] : '0');
+            $sheet->setCellValue('J'.$row,(isset($lastdatum['mid'])) ? $lastdatum['mid'] : '0');
+            $sheet->setCellValue('K'.$row,(isset($lastdatum['high'])) ? $lastdatum['high'] : '0');
+
+            $sheet->setCellValue('L'.$row,'=SUM(M'.$row.':P'.$row.')');
+            $sheet->setCellValue('M'.$row,(isset($lastlastdata[$path]['none'])) ? $lastlastdata[$path]['none'] : '0');
+            $sheet->setCellValue('N'.$row,(isset($lastlastdata[$path]['low'])) ? $lastlastdata[$path]['low'] : '0');
+            $sheet->setCellValue('O'.$row,(isset($lastlastdata[$path]['mid'])) ? $lastlastdata[$path]['mid'] : '0');
+            $sheet->setCellValue('P'.$row,(isset($lastlastdata[$path]['high'])) ? $lastlastdata[$path]['high'] : '0');
+
+            $row++;
+        }
+        unset($path,$lastdatum);
+
 
         $row--;
         $sheet->getStyle('B4:B'.$row)->applyFromArray($styleSumHead);
@@ -439,6 +423,59 @@ class Excel_model extends CI_Model
         return $results;
     }
 
+    public function monthsum_bc($data,$yyyymm)
+    {
+        $results = array();
+
+        foreach ($data as $key => $datum)
+        {
+            if ( ! is_numeric($key))
+            {
+                continue;
+            }
+            if ( ! isset($results[$datum['breadcrumb']]))
+            {
+                $results[$datum['breadcrumb']] = array(
+                    'site_id' => $datum['site_id'],
+                    'lowpage_id' => $datum['id'],
+                    'path' => $datum['path'],
+                    'breadcrumb' => $datum['breadcrumb'],
+                    'yyyymm' => $yyyymm,
+                    'pages' => 0,
+                    'none' => 0,
+                    'low' => 0,
+                    'mid' => 0,
+                    'high' => 0,
+                );
+            }
+
+            $results[$datum['breadcrumb']][$datum['operation']] += 1;
+            $results[$datum['breadcrumb']]['pages'] += 1;
+
+        }
+        unset($datum);
+
+        foreach ($results as $result)
+        {
+            $data = array(
+                'site_id' => $result['site_id'],
+                'lowpage_id' => $result['lowpage_id'],
+                'path' => $result['path'],
+                'breadcrumb' => $result['breadcrumb'],
+                'pages' => $result['pages'],
+                'none' => $result['none'],
+                'low' => $result['low'],
+                'mid' => $result['mid'],
+                'high' => $result['high'],
+                'yyyymm' => $result['yyyymm']
+            );
+            $this->db->replace('lpsum', $data);
+        }
+
+        ksort($results);
+
+        return $results;
+    }
     public function monthsum($data,$yyyymm)
     {
         $results = array();
